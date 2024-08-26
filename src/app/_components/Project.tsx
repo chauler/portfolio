@@ -26,10 +26,10 @@ export default function Project({
         />
       </div>
       <div className="flex flex-col flex-wrap gap-2">
-        <div className="text-accent flex justify-between gap-2 border-b border-white font-bold leading-tight tracking-tight sm:text-[3rem]">
+        <div className="flex justify-between gap-2 border-b border-white font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
           {title}
         </div>
-        <div className="text-accent flex flex-grow flex-col justify-between break-words">
+        <div className="flex flex-grow flex-col justify-between break-words text-accent">
           {children}
           <div className="block flex justify-start gap-2 self-end">
             {languages
@@ -58,11 +58,13 @@ export default function Project({
                   }
                 })
               : null}
-            {ghLink ? (
-              <IconBase link={ghLink}>
-                <GHIcon></GHIcon>
-              </IconBase>
-            ) : null}
+            <div className="ml-3 min-w-8 text-center">
+              {ghLink ? (
+                <IconBase link={ghLink}>
+                  <GHIcon></GHIcon>
+                </IconBase>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
