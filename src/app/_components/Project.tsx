@@ -3,13 +3,13 @@ import { Language } from "../../types/language-icons";
 import { CPPIcon, GHIcon, GLIcon, IconBase, JSIcon } from "./icon";
 
 export default function Project({
-  thumbnailPath,
+  thumbnail,
   title,
   children,
   ghLink,
   languages,
 }: {
-  thumbnailPath: string;
+  thumbnail: { video?: boolean; path: string };
   title: string;
   ghLink?: string;
   children?: React.ReactNode;
@@ -18,12 +18,22 @@ export default function Project({
   return (
     <div className="flex w-11/12 gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
       <div className="relative h-96 w-96 flex-none">
-        <Image
-          src={thumbnailPath}
-          alt="Project showcase picture"
-          fill={true}
-          className="rounded-xl object-cover"
-        />
+        {thumbnail.video ? (
+          <video
+            src={thumbnail.path}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            className="rounded-xl object-cover"
+          ></video>
+        ) : (
+          <Image
+            src={thumbnail.path}
+            alt="Project showcase picture"
+            fill={true}
+            className="rounded-xl object-cover"
+          />
+        )}
       </div>
       <div className="flex flex-col flex-wrap gap-2">
         <div className="flex justify-between gap-2 border-b border-white font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">

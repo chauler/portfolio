@@ -4,7 +4,7 @@ export function JSIcon() {
       <path
         fill="#ffffff"
         stroke="#000000"
-        stroke-width={2}
+        strokeWidth={2}
         strokeLinecap="round"
         strokeMiterlimit={10}
         d="M6.667,45C5.75,45,5,44.25,5,43.333V6.667C5,5.75,5.75,5,6.667,5h36.667C44.25,5,45,5.75,45,6.667v36.667C45,44.25,44.25,45,43.333,45H6.667z"
