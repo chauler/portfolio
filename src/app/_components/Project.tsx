@@ -24,6 +24,7 @@ export default function Project({
             autoPlay={true}
             loop={true}
             controls={false}
+            muted={true}
             className="rounded-xl object-cover"
           ></video>
         ) : (
