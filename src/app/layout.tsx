@@ -37,7 +37,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body
         className={cn(
-          "magicpattern min-h-screen bg-repeat-y font-sans antialiased backdrop-blur",
+          "min-h-screen bg-gradient-to-b from-primary to-popover-foreground font-sans antialiased",
           fontSans.variable,
         )}
       >
