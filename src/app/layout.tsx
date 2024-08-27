@@ -37,7 +37,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body
         className={cn(
-          "from-primary to-popover-foreground min-h-screen bg-gradient-to-b font-sans antialiased",
+          "magicpattern min-h-screen bg-repeat-y font-sans antialiased backdrop-blur",
           fontSans.variable,
         )}
       >
@@ -51,7 +51,7 @@ export default function RootLayout({
                       className={
                         navigationMenuTriggerStyle() +
                         " " +
-                        "focus:text-accent focus:bg-primary border-b border-r border-black focus:outline-none"
+                        "border-b border-r border-black focus:bg-primary focus:text-accent focus:outline-none"
                       }
                     >
                       Home
