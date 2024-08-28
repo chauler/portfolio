@@ -3,6 +3,7 @@ import { HydrateClient } from "~/trpc/server";
 import Header from "../_components/Header";
 import Project from "../_components/Project";
 import { Language } from "~/types/language-icons";
+import Link from "next/link";
 
 export default async function Projects() {
   return (
@@ -49,7 +50,7 @@ export default async function Projects() {
               </p>
             </Project>
             <Project
-              thumbnail={{ video: true, path: "spoutshowcase.webm" }}
+              thumbnail={{ video: true, path: "/spoutshowcase.webm" }}
               title="Spout Effects"
               ghLink="https://github.com/chauler/spout-program"
               languages={[Language.CPP, Language.OPENGL]}
