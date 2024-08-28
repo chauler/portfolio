@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { Language } from "../../types/language-icons";
 import { CPPIcon, GHIcon, GLIcon, IconBase, JSIcon } from "./icon";
+import type { MDXComponents } from "mdx/types";
+import Thing from "~/data/SpoutEffects.mdx";
 
-export default function Project({
+export function Project({
   thumbnail,
   title,
   children,
@@ -81,4 +83,20 @@ export default function Project({
       </div>
     </div>
   );
+}
+
+export default function Project2({
+  thumbnail,
+  title,
+  children,
+  ghLink,
+  languages,
+}: {
+  thumbnail: { video?: boolean; path: string };
+  title: string;
+  ghLink?: string;
+  children?: React.ReactNode;
+  languages?: Language[];
+}) {
+  return <Thing></Thing>;
 }
