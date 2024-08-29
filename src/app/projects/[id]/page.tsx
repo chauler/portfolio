@@ -1,10 +1,12 @@
 import Header from "~/app/_components/Header";
 import { api, HydrateClient } from "~/trpc/server";
-import { ProjectData } from "~/data/projectsData";
 import Image from "next/image";
 
+/*
+TODO: VERIFY IF THUMBNAIL IS AN IMAGE OR VIDEO
+*/
 export default async function Page({ params }: { params: { id: string } }) {
-  const project = await api.project.getLatest(Number.parseInt(params.id));
+  const project = await api.project.getProject(Number.parseInt(params.id));
   if (!project) {
     return <></>;
   }
@@ -13,16 +15,16 @@ export default async function Page({ params }: { params: { id: string } }) {
       <main className="flex min-h-full flex-col items-center justify-center text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <Header>{project.title}</Header>
-          {project.thumbnail.video ? (
+          {project.thumbnailPath ? (
             <video
-              src={`${project.thumbnail.path}`}
+              src={`${project.thumbnailPath}`}
               autoPlay={true}
               controls={false}
               muted={true}
             ></video>
           ) : (
             <Image
-              src={`${project.thumbnail.path}`}
+              src={`${project.thumbnailPath}`}
               alt="Project showcase picture"
               fill={true}
               className="rounded-xl object-cover"

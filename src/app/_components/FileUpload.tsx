@@ -2,7 +2,7 @@
 import { useDropzone } from "@uploadthing/react";
 import { useCallback, useState } from "react";
 import { generateClientDropzoneAccept } from "uploadthing/client";
-import { ClientUploadedFileData } from "uploadthing/types";
+import { type ClientUploadedFileData } from "uploadthing/types";
 import { useUploadThing } from "~/lib/uploadthing";
 
 export function MultiUploader() {

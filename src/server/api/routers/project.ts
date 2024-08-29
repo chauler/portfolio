@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { projectsData } from "~/data/projectsData";
 import { db } from "~/db/index";
 import * as schema from "~/db/schema";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
