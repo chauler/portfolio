@@ -4,13 +4,15 @@ import { CPPIcon, GHIcon, GLIcon, IconBase, JSIcon } from "./icon";
 import type { MDXComponents } from "mdx/types";
 import Thing from "~/data/SpoutEffects.mdx";
 
-export function Project({
+export default function Project({
+  id,
   thumbnail,
   title,
   children,
   ghLink,
   languages,
 }: {
+  id: number;
   thumbnail: { video?: boolean; path: string };
   title: string;
   ghLink?: string;
@@ -85,7 +87,7 @@ export function Project({
   );
 }
 
-export default function Project2({
+export function Project2({
   thumbnail,
   title,
   children,

@@ -1,10 +1,9 @@
+import "@uploadthing/react/styles.css";
 import "~/styles/globals.css";
-
 import { GeistSans } from "geist/font/sans";
 import { Inter as FontSans } from "next/font/google";
 import { type Metadata } from "next";
 import { cn } from "../lib/utils";
-
 import { TRPCReactProvider } from "~/trpc/react";
 import {
   NavigationMenu,
@@ -21,7 +20,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Alex's Portfolio",
-  description: "CS student at UNOmaha, focused desktop and web programming.",
+  description: "CS student at UNOmaha, focused on desktop and web programming.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
