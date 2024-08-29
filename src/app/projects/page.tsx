@@ -12,12 +12,12 @@ export default function Projects() {
           <Header>Submit a new project</Header>
           <div className="flex w-10/12 flex-col items-center gap-8"></div>
           <form action={SubmitProject}>
-            <label htmlFor="Title">Title:</label>
+            <label htmlFor="Title">Title: </label>
             <input type="text" name="Title" className="text-black"></input>
             <div>
               <br></br>
             </div>
-            <label htmlFor="Brief">Brief:</label>
+            <label htmlFor="Brief">Brief: </label>
             <textarea
               name="Brief"
               rows={5}
@@ -27,12 +27,22 @@ export default function Projects() {
             <div>
               <br></br>
             </div>
-            <label htmlFor="Content">Content:</label>
+            <label htmlFor="Languages">Languages: </label>
+            <select name="Languages" multiple>
+              <option value="volvo">Volvo</option>
+              <option value="saab">Saab</option>
+              <option value="fiat">Fiat</option>
+              <option value="audi">Audi</option>
+            </select>
+            <div>
+              <br></br>
+            </div>
+            <label htmlFor="Content">Content: </label>
             <input type="file" name="Content"></input>
             <div>
               <br></br>
             </div>
-            <label htmlFor="Thumbnail">Thumbnail:</label>
+            <label htmlFor="Thumbnail">Thumbnail: </label>
             <input type="file" name="Thumbnail"></input>
             <div>
               <br></br>
