@@ -34,7 +34,7 @@ export default async function Projects() {
             <div>
               <br></br>
             </div>
-            <label htmlFor="Brief">Brief: </label>
+            <label htmlFor="Brief">Brief:</label>
             <textarea
               name="Brief"
               rows={5}
