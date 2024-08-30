@@ -3,8 +3,20 @@ import { HydrateClient } from "~/trpc/server";
 import Header from "../_components/Header";
 import { SubmitProject } from "../_actions/SubmitProjectAction";
 import { MultiUploader } from "../_components/FileUpload";
+import { Language } from "~/types/language-icons";
+import { auth } from "~/auth/auth";
+import SignIn from "../_components/SignIn";
 
-export default function Projects() {
+export default async function Projects() {
+  const session = await auth();
+  if (!session)
+    return (
+      <>
+        <SignIn></SignIn>
+        <div className="text-white">Not Authenticated - Administrator only</div>
+      </>
+    );
+
   return (
     <HydrateClient>
       <main className="flex min-h-full flex-col items-center justify-center text-white">
@@ -13,7 +25,12 @@ export default function Projects() {
           <div className="flex w-10/12 flex-col items-center gap-8"></div>
           <form action={SubmitProject}>
             <label htmlFor="Title">Title: </label>
-            <input type="text" name="Title" className="text-black"></input>
+            <input
+              type="text"
+              name="Title"
+              required={true}
+              className="text-black"
+            ></input>
             <div>
               <br></br>
             </div>
@@ -22,28 +39,34 @@ export default function Projects() {
               name="Brief"
               rows={5}
               cols={40}
+              required={true}
               className="text-black"
             ></textarea>
             <div>
               <br></br>
             </div>
+            <label htmlFor="ghLink">Repo Link: </label>
+            <input type="text" name="ghLink" className="text-black"></input>
+            <div>
+              <br></br>
+            </div>
             <label htmlFor="Languages">Languages: </label>
-            <select name="Languages" multiple>
-              <option value="volvo">Volvo</option>
-              <option value="saab">Saab</option>
-              <option value="fiat">Fiat</option>
-              <option value="audi">Audi</option>
+            <select name="Languages" multiple className="text-black">
+              <option value={Language.CPP}>CPP</option>
+              <option value={Language.JS}>JS</option>
+              <option value={Language.OPENGL}>OpenGL</option>
+              <option value={Language.C}>C</option>
             </select>
             <div>
               <br></br>
             </div>
             <label htmlFor="Content">Content: </label>
-            <input type="file" name="Content"></input>
+            <input type="file" name="Content" required={true}></input>
             <div>
               <br></br>
             </div>
             <label htmlFor="Thumbnail">Thumbnail: </label>
-            <input type="file" name="Thumbnail"></input>
+            <input type="file" name="Thumbnail" required={true}></input>
             <div>
               <br></br>
             </div>

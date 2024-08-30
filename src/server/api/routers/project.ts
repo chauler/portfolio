@@ -13,4 +13,9 @@ export const ProjectRouter = createTRPCRouter({
         });
       return project;
     }),
+  getProjects: publicProcedure.query(async () => {
+    const projects: schema.SelectPost[] | undefined =
+      await db.query.postsTable.findMany({ limit: 10 });
+    return projects;
+  }),
 });

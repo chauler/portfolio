@@ -46,7 +46,7 @@ export default function RootLayout({
                       className={
                         navigationMenuTriggerStyle() +
                         " " +
-                        "border-b border-r border-black focus:bg-primary focus:text-accent focus:outline-none"
+                        "border-b border-r border-black focus:bg-primary focus:text-accent focus:outline-none active:text-accent"
                       }
                     >
                       Home

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { utapi } from "~/server/uploadthing";
 import { db } from "~/db";
 import { type InsertPost, postsTable } from "~/db/schema";
+import { Language } from "~/types/language-icons";
 
 const MAX_FILE_SIZE = 10000000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -33,6 +34,8 @@ const ProjectFormData = z.object({
     .instanceof(File)
     .refine((file) => file.size >= 1 && file.size <= MAX_FILE_SIZE)
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
+  ghLink: z.string(),
+  languages: z.nativeEnum(Language).array(),
 });
 
 export async function SubmitProject(formData: FormData) {
@@ -41,6 +44,8 @@ export async function SubmitProject(formData: FormData) {
     brief: formData.get("Brief"),
     content: formData.get("Content"),
     thumbnail: formData.get("Thumbnail"),
+    ghLink: formData.get("ghLink"),
+    languages: formData.getAll("Languages"),
   });
 
   if (!validatedInput.success) {
@@ -68,6 +73,8 @@ export async function SubmitProject(formData: FormData) {
     brief: validatedInput.data.brief,
     contentPath: `https://utfs.io/f/${response[0]?.data?.key}`,
     thumbnailPath: `https://utfs.io/f/${response[1]?.data?.key}`,
+    ghLink: validatedInput.data.ghLink,
+    languages: { languages: validatedInput.data.languages },
   };
 
   await db.insert(postsTable).values(dataToUpload);
