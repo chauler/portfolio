@@ -10,6 +10,7 @@ import SignIn from "../_components/SignIn";
 
 export default async function Projects() {
   const session = await auth();
+
   if (!session || session.user?.email !== "amt1309@gmail.com")
     return (
       <>
