@@ -1,3 +1,4 @@
+"use server";
 /* eslint-disable react/jsx-key */
 import { HydrateClient } from "~/trpc/server";
 import Header from "../_components/Header";
@@ -9,7 +10,7 @@ import SignIn from "../_components/SignIn";
 
 export default async function Projects() {
   const session = await auth();
-  if (!session)
+  if (!session || session.user?.email !== "amt1309@gmail.com")
     return (
       <>
         <SignIn></SignIn>
