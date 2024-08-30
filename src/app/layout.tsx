@@ -7,12 +7,15 @@ import { cn } from "../lib/utils";
 import { TRPCReactProvider } from "~/trpc/react";
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu";
 import Link from "next/link";
+import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {
   title: "Alex's Portfolio",
@@ -25,9 +28,11 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const projects = await api.project.getProjects();
+
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body
@@ -37,25 +42,46 @@ export default function RootLayout({
         )}
       >
         <TRPCReactProvider>
-          <NavigationMenu>
+          <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-primary/85 filter backdrop-blur-lg">
             <NavigationMenuList>
-              <div>
-                <NavigationMenuItem>
-                  <Link href="/" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={
-                        navigationMenuTriggerStyle() +
-                        " " +
-                        "border-b border-r border-black focus:bg-primary focus:text-accent focus:outline-none active:text-accent"
-                      }
-                    >
-                      Home
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </div>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul>
+                    {projects
+                      ? projects.map((project, index) => (
+                          <li key={index}>
+                            <NavigationMenuLink>
+                              <a
+                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                href={`/projects/${project.id}`}
+                              >
+                                {project.title}
+                              </a>
+                            </NavigationMenuLink>
+                          </li>
+                        ))
+                      : null}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/resume.pdf" target="_blank">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Resume
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Home
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
           {children}
         </TRPCReactProvider>
       </body>

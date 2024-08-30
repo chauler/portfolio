@@ -21,8 +21,8 @@ export default function Project({
 }) {
   return (
     <a href={`./projects/${id}`}>
-      <div className="flex w-11/12 gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
-        <div className="relative h-96 w-96 flex-none">
+      <div className="flex w-11/12 flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
+        <div className="relative h-96 w-96 max-w-full flex-none">
           {thumbnail.video ? (
             <video
               src={thumbnail.path}
@@ -37,12 +37,12 @@ export default function Project({
               src={thumbnail.path}
               alt="Project showcase picture"
               fill={true}
-              className="rounded-xl object-cover"
+              className="rounded-xl object-scale-down"
             />
           )}
         </div>
         <div className="flex flex-col flex-wrap gap-2">
-          <div className="flex justify-between gap-2 border-b border-white font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
+          <div className="flex justify-between gap-2 border-b border-white text-[2rem] font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
             {title}
           </div>
           <div className="flex flex-grow flex-col justify-between break-words text-accent">
