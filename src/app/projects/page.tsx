@@ -5,19 +5,17 @@ import Header from "../_components/Header";
 import { SubmitProject } from "../_actions/SubmitProjectAction";
 import { MultiUploader } from "../_components/FileUpload";
 import { Language } from "~/types/language-icons";
-import { auth } from "~/auth/auth";
-import SignIn from "../_components/SignIn";
 
 export default async function Projects() {
-  const session = await auth();
+  // const session = await auth();
 
-  if (!session || session.user?.email !== "amt1309@gmail.com")
-    return (
-      <>
-        <SignIn></SignIn>
-        <div className="text-white">Not Authenticated - Administrator only</div>
-      </>
-    );
+  // if (!session || session.user?.email !== "amt1309@gmail.com")
+  //   return (
+  //     <>
+  //       <SignIn></SignIn>
+  //       <div className="text-white">Not Authenticated - Administrator only</div>
+  //     </>
+  //   );
 
   return (
     <HydrateClient>
