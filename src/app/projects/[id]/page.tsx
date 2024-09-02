@@ -14,6 +14,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     <HydrateClient>
       <main className="flex min-h-full flex-col items-center justify-center text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
+          <Header>(Still Under Construction)</Header>
           <Header>{project.title}</Header>
           {project.thumbnailPath ? (
             <video
