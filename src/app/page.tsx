@@ -19,14 +19,6 @@ export default async function Home() {
           </h2>
           <div className="flex justify-between gap-2 sm:gap-4 md:gap-8">
             <Link
-              className="flex max-w-xs gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="./projects"
-            >
-              <h3 className="whitespace-nowrap text-2xl font-bold">
-                Submit a new Project →
-              </h3>
-            </Link>
-            <Link
               className="flex max-w-xs justify-between gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
               href="resume.pdf"
               target="_blank"
