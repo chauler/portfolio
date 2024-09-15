@@ -33,12 +33,7 @@ export default async function Home() {
                   <Project
                     key={project.id}
                     id={project.id}
-                    thumbnail={{
-                      video: ["webm", "mp4"].includes(
-                        project.thumbnailPath.split(".").pop() ?? "",
-                      ),
-                      path: project.thumbnailPath,
-                    }}
+                    thumbnail={project.thumbnailPath}
                     title={project.title}
                     ghLink={project.ghLink ?? ""}
                     languages={project.languages?.languages}

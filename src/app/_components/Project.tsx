@@ -3,6 +3,8 @@ import { Language } from "../../types/language-icons";
 import { CPPIcon, GHIcon, GLIcon, IconBase, JSIcon } from "./icon";
 import type { MDXComponents } from "mdx/types";
 import Thing from "~/data/SpoutEffects.mdx";
+import { IsVideoFileExt } from "~/lib/utils";
+import Link from "next/link";
 
 export default function Project({
   id,
@@ -13,19 +15,19 @@ export default function Project({
   languages,
 }: {
   id: number;
-  thumbnail: { video?: boolean; path: string };
+  thumbnail: string;
   title: string;
   ghLink?: string;
   children?: React.ReactNode;
   languages?: Language[];
 }) {
   return (
-    <a href={`./projects/${id}`}>
+    <Link href={`./projects/${id}`}>
       <div className="flex w-11/12 flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
         <div className="relative h-96 w-96 max-w-full flex-none">
-          {thumbnail.video ? (
+          {IsVideoFileExt(thumbnail) ? (
             <video
-              src={thumbnail.path}
+              src={thumbnail}
               autoPlay={true}
               loop={true}
               controls={false}
@@ -34,7 +36,7 @@ export default function Project({
             ></video>
           ) : (
             <Image
-              src={thumbnail.path}
+              src={thumbnail}
               alt="Project showcase picture"
               fill={true}
               className="rounded-xl object-scale-down"
@@ -85,6 +87,6 @@ export default function Project({
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

@@ -16,6 +16,7 @@ import {
 } from "~/components/ui/navigation-menu";
 import Link from "next/link";
 import { api } from "~/trpc/server";
+import BackgroundCanvas from "./_components/BackgroundCanvas";
 
 export const metadata: Metadata = {
   title: "Alex's Portfolio",
@@ -37,12 +38,12 @@ export default async function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body
         className={cn(
-          "min-h-screen bg-gradient-to-b from-primary to-popover-foreground font-sans antialiased",
+          "min-h-screen bg-black font-sans antialiased backdrop-blur-3xl",
           fontSans.variable,
         )}
       >
         <TRPCReactProvider>
-          <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-primary/85 filter backdrop-blur-lg">
+          <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-transparent filter">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
@@ -85,6 +86,7 @@ export default async function RootLayout({
           {children}
         </TRPCReactProvider>
       </body>
+      <BackgroundCanvas></BackgroundCanvas>
     </html>
   );
 }
