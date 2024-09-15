@@ -24,6 +24,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const CustomComponents: MDXComponents = useMDXComponents();
 
+  // @ts-expect-error: `runtime` types are currently broken.
   const { default: MDXContent } = await run(code, {
     ...runtime,
     baseUrl: import.meta.url,
