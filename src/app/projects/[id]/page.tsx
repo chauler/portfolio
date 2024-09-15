@@ -1,36 +1,48 @@
-import Header from "~/app/_components/Header";
 import { api, HydrateClient } from "~/trpc/server";
-import Image from "next/image";
+import * as runtime from "react/jsx-runtime";
+import { compile, run } from "@mdx-js/mdx";
+import { useMDXComponents } from "mdx-components";
+import { MDXComponents } from "mdx/types";
+
+function Thing() {
+  return <>World</>;
+}
 
 /*
 TODO: VERIFY IF THUMBNAIL IS AN IMAGE OR VIDEO
 */
 export default async function Page({ params }: { params: { id: string } }) {
   const project = await api.project.getProject(Number.parseInt(params.id));
-  if (!project) {
+  const res = await fetch(project?.contentPath ?? "");
+  const markdown = await res.text();
+
+  console.log(markdown);
+
+  const code = String(
+    await compile(markdown, { outputFormat: "function-body" }),
+  );
+
+  const CustomComponents: MDXComponents = useMDXComponents();
+
+  const { default: MDXContent } = await run(code, {
+    ...runtime,
+    baseUrl: import.meta.url,
+  });
+
+  if (!markdown) {
     return <></>;
   }
+
+  console.log(project?.thumbnailPath);
+
   return (
     <HydrateClient>
-      <main className="flex min-h-full flex-col items-center justify-center text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <Header>(Still Under Construction)</Header>
-          <Header>{project.title}</Header>
-          {project.thumbnailPath ? (
-            <video
-              src={`${project.thumbnailPath}`}
-              autoPlay={true}
-              controls={false}
-              muted={true}
-            ></video>
-          ) : (
-            <Image
-              src={`${project.thumbnailPath}`}
-              alt="Project showcase picture"
-              fill={true}
-              className="rounded-xl object-cover"
-            ></Image>
-          )}
+      <main className="container flex min-h-full flex-col items-center justify-center rounded-3xl bg-white/5 text-white">
+        <div className="w-11/12 py-16">
+          <MDXContent
+            components={{ Thing, ...CustomComponents }}
+            image={project?.thumbnailPath}
+          ></MDXContent>
         </div>
       </main>
     </HydrateClient>

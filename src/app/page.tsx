@@ -39,7 +39,7 @@ export default async function Home() {
           </div>
           <div className="py-4 sm:py-16"></div>
           <div className="flex w-full flex-col items-center gap-8 pb-12">
-            <Header>My Links</Header>
+            <Header>Links</Header>
             <div className="flex flex-col gap-12 sm:flex-row">
               <Link
                 className="flex max-w-xs justify-between gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"

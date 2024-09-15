@@ -23,7 +23,7 @@ export default function Project({
 }) {
   return (
     <div className="flex w-11/12 justify-center">
-      <Link href={`./projects/${id}`}>
+      <Link href={`./projects/${id}`} className="pointer-events-none">
         <div className="flex w-full flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
           <div className="relative aspect-square w-full max-w-full flex-none md:w-[30%]">
             {IsVideoFileExt(thumbnail) ? (

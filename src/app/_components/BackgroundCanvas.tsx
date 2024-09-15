@@ -1,6 +1,7 @@
 "use client";
-import { motion, useTime, useTransform } from "framer-motion";
+import { motion, useTime } from "framer-motion";
 import { useState, useEffect, useLayoutEffect } from "react";
+import { clamp } from "~/lib/utils";
 
 export default function BackgroundCanvas() {
   function getWindowDimensions() {
@@ -29,8 +30,6 @@ export default function BackgroundCanvas() {
 
     return windowDimensions;
   }
-
-  console.log("RENDERING BACKGROUND");
 
   const { width, height } = useWindowDimensions();
   const gridW = 60;
@@ -67,7 +66,7 @@ export default function BackgroundCanvas() {
                   x={x}
                   y={y}
                   initial={{
-                    activated: Math.random() > 0.99,
+                    activated: Math.random() > 0.98,
                     opacity: Math.random(),
                     scale: Math.random(),
                   }}
@@ -129,8 +128,4 @@ function Cell({
       }}
     ></motion.div>
   );
-}
-
-function clamp(number: number, min = 0, max = 1) {
-  return Math.max(min, Math.min(number, max));
 }
