@@ -93,7 +93,7 @@ function Cell({
     initial = { activated: false, scale: 0, opacity: 0 };
   }
 
-  const [activated, setActivated] = useState(false);
+  const [activated, setActivated] = useState(initial.activated);
   const time = useTime();
 
   useEffect(() => {
