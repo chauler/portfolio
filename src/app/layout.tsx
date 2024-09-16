@@ -67,7 +67,10 @@ export default async function RootLayout({
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href="/resume.pdf" target="_blank">
+                <Link
+                  href="https://utfs.io/f/hbsTnyPlc753b8XKjI36e9R2DzFCSyxYWMfcaXk4ilQg1HKT"
+                  target="_blank"
+                >
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Resume
                   </NavigationMenuLink>
