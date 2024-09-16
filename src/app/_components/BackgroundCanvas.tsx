@@ -94,11 +94,6 @@ function Cell({
   }
 
   const [activated, setActivated] = useState(initial.activated);
-  const time = useTime();
-
-  useEffect(() => {
-    time.setCurrent(0);
-  }, [activated]);
 
   useEffect(() => {
     function RNGActivate() {

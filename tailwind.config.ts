@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
@@ -9,6 +10,15 @@ const config = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
     "./mdx-components.tsx",
+  ],
+  safelist: [
+    "float-left",
+    "float-right",
+    "pr-8",
+    "pl-8",
+    "rounded-xl",
+    "pt-8",
+    "pb-8",
   ],
   prefix: "",
   theme: {

@@ -2,21 +2,16 @@ import { api, HydrateClient } from "~/trpc/server";
 import * as runtime from "react/jsx-runtime";
 import { compile, run } from "@mdx-js/mdx";
 import { useMDXComponents } from "mdx-components";
-import { MDXComponents } from "mdx/types";
+import type { MDXComponents } from "mdx/types";
 
 function Thing() {
   return <>World</>;
 }
 
-/*
-TODO: VERIFY IF THUMBNAIL IS AN IMAGE OR VIDEO
-*/
 export default async function Page({ params }: { params: { id: string } }) {
   const project = await api.project.getProject(Number.parseInt(params.id));
   const res = await fetch(project?.contentPath ?? "");
   const markdown = await res.text();
-
-  console.log(markdown);
 
   const code = String(
     await compile(markdown, { outputFormat: "function-body" }),
@@ -39,9 +34,9 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <HydrateClient>
       <main className="container flex min-h-full flex-col items-center justify-center rounded-3xl bg-white/5 text-white">
-        <div className="w-11/12 py-16">
+        <div className="flex w-11/12 flex-col py-16">
           <MDXContent
-            components={{ Thing, ...CustomComponents }}
+            components={{ ...CustomComponents }}
             image={project?.thumbnailPath}
           ></MDXContent>
         </div>
