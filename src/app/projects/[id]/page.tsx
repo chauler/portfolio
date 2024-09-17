@@ -4,10 +4,6 @@ import { compile, run } from "@mdx-js/mdx";
 import { useMDXComponents } from "mdx-components";
 import type { MDXComponents } from "mdx/types";
 
-function Thing() {
-  return <>World</>;
-}
-
 export default async function Page({ params }: { params: { id: string } }) {
   const project = await api.project.getProject(Number.parseInt(params.id));
   const res = await fetch(project?.contentPath ?? "");
