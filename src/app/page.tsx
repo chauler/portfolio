@@ -12,10 +12,14 @@ export default async function Home() {
       <main className="flex min-h-full flex-col items-center justify-center text-white">
         <div className="flex flex-col items-center justify-center gap-12 py-16">
           <Header>Hey, I&apos;m Alex.</Header>
-          <h2 className="max-w-2xl text-center text-lg font-bold leading-none tracking-tight md:text-2xl">
+          <h2 className="max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
             I&apos;m Alex Tomjack, a computer science graduate from the
             University of North Texas, currently studying for my master&apos;s
             at the University of Nebraska-Omaha.
+          </h2>
+          <h2 className="mt-[-2rem] max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
+            I have experience working in C/C++ in a research lab setting, and I
+            also use TypeScript/Python/React for my projects.
           </h2>
           <div className="py-4 sm:py-16"></div>
           <div className="flex w-full flex-col items-center justify-center gap-8 bg-slate-50/[0.05] py-8">
