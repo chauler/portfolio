@@ -23,7 +23,9 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
       <h3 className="self-center pb-4 text-[2rem] font-bold">{children}</h3>
     ),
     p: ({ children }) => <p className="py-2 text-xl">{children}</p>,
-    img: (props) => <Image {...props}></Image>,
+    img: (props) => (
+      <Image {...props} width={500} height={500} objectFit="fill"></Image>
+    ),
     Image: (props: { src: string; width: number; height: number }) =>
       IsImageFileExt(props.src) ? (
         <Image {...props}></Image>
