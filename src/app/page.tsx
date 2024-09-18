@@ -60,6 +60,12 @@ export default async function Home() {
               >
                 <h3 className="text-2xl font-bold">LinkedIn →</h3>
               </Link>
+              <Link
+                className="flex max-w-xs justify-between gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+                href="mailto:amt1309@gmail.com"
+              >
+                <h3 className="text-2xl font-bold">Email →</h3>
+              </Link>
             </div>
           </div>
         </div>
