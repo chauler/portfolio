@@ -35,10 +35,10 @@ export default async function RootLayout({
   const projects = await api.project.getProjects();
 
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} bg-black`}>
       <body
         className={cn(
-          "min-h-screen bg-black font-sans antialiased backdrop-blur-3xl",
+          "min-h-screen bg-black/90 font-sans antialiased backdrop-blur-md",
           fontSans.variable,
         )}
       >
