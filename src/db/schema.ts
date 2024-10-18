@@ -18,5 +18,15 @@ export const postsTable = sqliteTable("posts", {
   }>(),
 });
 
+export const imagesTable = sqliteTable("images", {
+  id: integer("id").primaryKey(),
+  postID: integer("postID")
+    .references(() => postsTable.id)
+    .notNull(),
+  link: text("link").notNull(),
+});
+
 export type InsertPost = typeof postsTable.$inferInsert;
 export type SelectPost = typeof postsTable.$inferSelect;
+export type InsertImage = typeof imagesTable.$inferInsert;
+export type SelectImage = typeof imagesTable.$inferSelect;

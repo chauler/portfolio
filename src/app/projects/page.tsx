@@ -1,13 +1,9 @@
 "use server";
 /* eslint-disable react/jsx-key */
 import { api, HydrateClient } from "~/trpc/server";
-import Header from "../_components/Header";
-import { SubmitProject } from "../_actions/SubmitProjectAction";
-import { Language } from "~/types/language-icons";
 import SignIn from "../_components/SignIn";
 import { auth } from "~/auth/auth";
 import ProjectEditor from "../_components/ProjectEditor";
-import type { Session } from "next-auth";
 import { IsAdmin } from "~/lib/utils";
 
 export default async function Projects() {

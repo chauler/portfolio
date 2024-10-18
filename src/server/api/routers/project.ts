@@ -18,4 +18,12 @@ export const ProjectRouter = createTRPCRouter({
       await db.query.postsTable.findMany({ limit: 10 });
     return projects;
   }),
+  getProjectImages: publicProcedure
+    .input(z.number().int().nonnegative())
+    .query(async ({ input }) => {
+      const images = await db.query.imagesTable.findMany({
+        where: (image, { eq }) => eq(image.postID, input),
+      });
+      return images;
+    }),
 });

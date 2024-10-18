@@ -1,3 +1,4 @@
+import React from "react";
 import {
   type DetailedHTMLProps,
   type SelectHTMLAttributes,
@@ -23,7 +24,7 @@ interface Props
 
 type Options = string | number | readonly string[] | undefined;
 
-export default function MultiSelector(props: Props) {
+function MultiSelector(props: Props) {
   const children = props.children.map((e, i) => {
     return { ...e, value: e.value ?? i };
   });
@@ -120,3 +121,15 @@ export default function MultiSelector(props: Props) {
     </div>
   );
 }
+
+export default React.memo(MultiSelector, (oldProps, newProps) => {
+  const oldLanguages = oldProps.children;
+  const newLanguages = newProps.children;
+  if (oldLanguages.length !== newLanguages.length) return false;
+  for (let i = 0; i < oldLanguages.length; i++) {
+    if (oldLanguages[i]?.value !== newLanguages[i]?.value) {
+      return false;
+    }
+  }
+  return true;
+});

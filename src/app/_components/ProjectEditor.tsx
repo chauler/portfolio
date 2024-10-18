@@ -14,6 +14,7 @@ import { SubmitProject } from "../_actions/SubmitProjectAction";
 import MultipleFileUpload from "./MultipleFileUpload";
 import { useDebounce } from "~/lib/clientutils";
 import MultiSelector from "./MultiSelector";
+import LoadingSymbol from "./LoadingSymbol";
 
 type ReactMDXContent = (props: MDXProps) => ReactNode;
 type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
@@ -46,6 +47,9 @@ export default function ProjectEditor({
   const [selectedID, setSelectedID] = useState(1);
   const projectQuery = api.project.getProject.useQuery(selectedID);
   const [source, setSource] = useState("");
+  const [pending, setPending] = useState(false);
+
+  console.log(pending);
 
   const [newProjectSource, setNewProjectSource] = useState("");
   const handleEdit = useDebounce<[ChangeEvent<HTMLTextAreaElement>]>((e) => {
@@ -77,13 +81,13 @@ export default function ProjectEditor({
 
   return (
     <div className="flex h-full text-white">
-      <main className="flex min-h-full w-[60%] max-w-[60%] flex-col items-center justify-center rounded-3xl bg-white/5 pl-8 pr-8 text-white">
+      <main className="flex h-fit min-h-fit w-[60%] max-w-[60%] flex-col items-center justify-center rounded-3xl bg-white/5 pl-8 pr-8 text-white">
         <div className="flex w-11/12 flex-grow-0 flex-col py-16">
           <MdxContent components={CustomComponents}></MdxContent>
         </div>
       </main>
-
       <form>
+        <LoadingSymbol setFormStatus={setPending}></LoadingSymbol>
         <label htmlFor="project" className="pr-4">
           Select a project:
         </label>
@@ -106,7 +110,9 @@ export default function ProjectEditor({
         </select>
 
         {selectedID === 0 ? (
-          <div className="container flex flex-col px-4">
+          <div
+            className={`container flex flex-col px-4 ${pending ? "hidden" : ""}`}
+          >
             <div className="flex w-10/12 flex-col items-center gap-8"></div>
             <label htmlFor="Title">Title: </label>
             <input
@@ -121,7 +127,7 @@ export default function ProjectEditor({
             <label htmlFor="Brief">Brief:</label>
             <textarea
               name="Brief"
-              rows={5}
+              rows={3}
               cols={40}
               required={true}
               className="w-full flex-grow text-nowrap bg-slate-950/50 text-white"
@@ -160,7 +166,7 @@ export default function ProjectEditor({
               }}
               className="w-full flex-grow text-nowrap bg-slate-950/50 text-white"
               cols={50}
-              rows={30}
+              rows={15}
             ></textarea>
             <div>
               <br></br>
@@ -186,7 +192,7 @@ export default function ProjectEditor({
             </button>
           </div>
         ) : (
-          <>
+          <div hidden={pending}>
             <button
               id="compile"
               className="rounded-xl bg-white/10 p-2 hover:bg-white/30"
@@ -218,7 +224,10 @@ export default function ProjectEditor({
             <textarea
               value={source}
               name="markdown"
-              onChange={(e) => setSource(e.target.value)}
+              onChange={(e) => {
+                setSource(e.target.value);
+                handleEdit(e);
+              }}
               className="w-full flex-grow text-nowrap bg-slate-950/50 text-white"
               cols={50}
               rows={30}
@@ -232,7 +241,7 @@ export default function ProjectEditor({
                   : ""
               }
             ></input>
-          </>
+          </div>
         )}
       </form>
     </div>
