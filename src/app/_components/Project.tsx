@@ -88,46 +88,49 @@ export default async function Project({
                 images={images.map((img) => img.link)}
               ></MDXContent>
             </div>
-            <div className="block flex justify-start gap-2 self-end">
-              {languages
-                ? languages.map((language, index) => {
-                    switch (language) {
-                      case Language.C:
-                        return (
-                          <IconBase key={index}>
-                            <CIcon></CIcon>
-                          </IconBase>
-                        );
-                      case Language.CPP:
-                        return (
-                          <IconBase key={index}>
-                            <CPPIcon></CPPIcon>
-                          </IconBase>
-                        );
-                      case Language.JS:
-                        return (
-                          <IconBase key={index}>
-                            <JSIcon></JSIcon>
-                          </IconBase>
-                        );
-                      case Language.OPENGL:
-                        return (
-                          <IconBase key={index}>
-                            <GLIcon></GLIcon>
-                          </IconBase>
-                        );
-                      case Language.TS:
-                        return (
-                          <IconBase key={index}>
-                            <TSIcon></TSIcon>
-                          </IconBase>
-                        );
-                      default:
-                        return null;
-                    }
-                  })
-                : null}
-              <div className="ml-3 min-w-8 text-center">
+            <div className="block flex h-[2.2rem] min-h-8 items-center justify-start gap-2 self-end">
+              <div className="flex max-h-[90%] min-w-8 flex-grow gap-2">
+                {languages
+                  ? languages.map((language, index) => {
+                      switch (language) {
+                        case Language.C:
+                          return (
+                            <IconBase key={index}>
+                              <CIcon></CIcon>
+                            </IconBase>
+                          );
+                        case Language.CPP:
+                          return (
+                            <IconBase key={index}>
+                              <CPPIcon></CPPIcon>
+                            </IconBase>
+                          );
+                        case Language.JS:
+                          return (
+                            <IconBase key={index}>
+                              <JSIcon></JSIcon>
+                            </IconBase>
+                          );
+                        case Language.OPENGL:
+                          return (
+                            <IconBase key={index}>
+                              <GLIcon></GLIcon>
+                            </IconBase>
+                          );
+                        case Language.TS:
+                          return (
+                            <IconBase key={index}>
+                              <TSIcon></TSIcon>
+                            </IconBase>
+                          );
+                        default:
+                          return null;
+                      }
+                    })
+                  : null}
+              </div>
+              <div className="self-stretch border-l-[1px] border-white"></div>
+              <div className="min-w-8 text-center">
                 {ghLink ? (
                   <IconBase link={ghLink}>
                     <GHIcon></GHIcon>
