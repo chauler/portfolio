@@ -10,7 +10,7 @@ export default async function Home() {
   return (
     <HydrateClient>
       <main className="flex min-h-full flex-col items-center justify-center text-white">
-        <div className="flex flex-col items-center justify-center gap-12 py-16">
+        <div className="flex w-full flex-col items-center justify-center gap-12 py-16">
           <Header>Hey, I&apos;m Alex.</Header>
           <h2 className="max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
             I&apos;m Alex Tomjack, a computer science graduate from the
@@ -30,13 +30,12 @@ export default async function Home() {
                     <Project
                       key={project.id}
                       id={project.id}
-                      thumbnail={project.thumbnailPath}
+                      thumbnailPath={project.thumbnailPath}
+                      briefPath={project.briefPath}
                       title={project.title}
                       ghLink={project.ghLink ?? ""}
                       languages={project.languages?.languages}
-                    >
-                      {project.brief}
-                    </Project>
+                    ></Project>
                   );
                 })
               : null}

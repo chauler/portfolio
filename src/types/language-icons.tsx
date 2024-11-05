@@ -1,6 +1,7 @@
 export enum Language {
   C = "C",
-  CPP = "CPP",
-  JS = "JS",
-  OPENGL = "OPENGL",
+  CPP = "C++",
+  JS = "JavaScript",
+  OPENGL = "OpenGL",
+  TS = "TypeScript",
 }

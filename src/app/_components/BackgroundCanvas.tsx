@@ -15,6 +15,15 @@ export default function BackgroundCanvas() {
         <Cell></Cell>
         <Cell></Cell>
         <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
+        <Cell></Cell>
       </div>
       <svg className="h-0 w-0">
         <defs>
@@ -44,7 +53,7 @@ function Cell() {
 
   return (
     <motion.div
-      className="absolute h-96 w-96 rounded-full bg-white"
+      className="absolute h-[36rem] w-[36rem] rounded-full bg-white"
       initial={{
         left: `${Math.random() * 100}%`,
         top: `${Math.random() * 100}%`,

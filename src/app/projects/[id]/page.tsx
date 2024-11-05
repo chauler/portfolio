@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             components={{ ...CustomComponents }}
             thumbnail={project?.thumbnailPath}
             languages={project?.languages}
-            images={images}
+            images={images.map((img) => img.link)}
           ></MDXContent>
         </div>
       </main>

@@ -11,7 +11,7 @@ export const postsTable = sqliteTable("posts", {
   title: text("title").unique().notNull(),
   contentPath: text("content").notNull(),
   thumbnailPath: text("thumbnailPath").notNull(),
-  brief: text("brief").notNull(),
+  briefPath: text("brief").notNull(),
   ghLink: text("ghLink"),
   languages: text("languages", { mode: "json" }).$type<{
     languages: Language[];

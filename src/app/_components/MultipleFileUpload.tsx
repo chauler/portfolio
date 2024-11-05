@@ -8,14 +8,23 @@ import {
 } from "react";
 import { cn } from "~/lib/utils";
 
-type Props = Omit<
-  DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-  "multiple" | "type"
->;
+interface Props
+  extends Omit<
+    DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+    "multiple" | "type" | "defaultValue"
+  > {
+  defaultValue?: File | File[];
+}
 
-export default function MultipleFileUpload({ ...props }: Props) {
+export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>(
+    defaultValue
+      ? Array.isArray(defaultValue)
+        ? [...defaultValue]
+        : [defaultValue]
+      : [],
+  );
 
   useEffect(() => {
     if (inputRef.current) {
@@ -24,6 +33,17 @@ export default function MultipleFileUpload({ ...props }: Props) {
       inputRef.current.files = dataTransfer.files;
     }
   }, [files]);
+
+  useEffect(() => {
+    console.log("Images changes. Rerendering");
+    setFiles(
+      defaultValue
+        ? Array.isArray(defaultValue)
+          ? [...defaultValue]
+          : [defaultValue]
+        : [],
+    );
+  }, [defaultValue]);
 
   return (
     <div className={cn("flex flex-col", props.className)}>

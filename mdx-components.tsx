@@ -2,9 +2,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
+import React from "react";
 import { MDXComponents } from "mdx/types";
-import Image from "next/image";
+import Image, { ImageLoaderProps } from "next/image";
 import { IsImageFileExt, IsVideoFileExt } from "~/lib/utils";
+import z, { string } from "zod";
 
 // This file is required to use @next/mdx in the `app` directory.
 export function useMDXComponents(components?: MDXComponents): MDXComponents {
@@ -23,25 +25,54 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
       <h3 className="self-center pb-4 text-[2rem] font-bold">{children}</h3>
     ),
     p: ({ children }) => <p className="py-2 text-xl">{children}</p>,
-    img: (props) => (
-      <Image {...props} width={500} height={500} objectFit="fill"></Image>
+    a: (props) => (
+      <a
+        className="text-blue-600 underline visited:text-purple-600 hover:text-blue-800"
+        href={props.href}
+        target="_blank"
+      >
+        {props.children}
+      </a>
     ),
-    Image: (props: { src: string; width: number; height: number }) =>
-      IsImageFileExt(props.src) ? (
-        <Image {...props}></Image>
-      ) : IsVideoFileExt(props.src) ? (
-        <video
-          src={props.src}
-          autoPlay={true}
-          loop={true}
-          controls={false}
-          muted={true}
-          className="rounded-xl object-cover"
-        ></video>
-      ) : null,
+    Image: (props) => (
+      <Image
+        {...props}
+        width={500}
+        height={500}
+        objectFit="fill"
+        alt="test"
+      ></Image>
+    ),
+    // Image: (props: { src: string; width: number; height: number }) => {
+    //   if (!ImageProps.safeParse(props).success) {
+    //     console.log("Invalid props");
+    //     return null;
+    //   }
+    //   return IsImageFileExt(props.src) ? (
+    //     <Image {...props}></Image>
+    //   ) : IsVideoFileExt(props.src) ? (
+    //     <video
+    //       src={props.src}
+    //       autoPlay={true}
+    //       loop={true}
+    //       controls={false}
+    //       muted={true}
+    //       className="rounded-xl object-cover"
+    //     ></video>
+    //   ) : (
+    //     () => {
+    //       console.log("No file extension");
+    //       return null;
+    //     }
+    //   );
+    // },
     ul: ({ children }) => <ul className="inline list-disc py-2">{children}</ul>,
     li: ({ children }) => <li className="py-2 text-xl">{children}</li>,
     em: ({ children }) => <em className="font-bold not-italic">{children}</em>,
     ...components,
   };
 }
+
+const ImageProps = z.object({
+  src: z.string(),
+});

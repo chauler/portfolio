@@ -1,94 +1,143 @@
 import Image from "next/image";
 import { Language } from "../../types/language-icons";
-import { CPPIcon, GHIcon, GLIcon, IconBase, JSIcon } from "./icon";
-import type { MDXComponents } from "mdx/types";
-import Thing from "~/data/SpoutEffects.mdx";
-import { IsVideoFileExt } from "~/lib/utils";
+import {
+  CIcon,
+  CPPIcon,
+  GHIcon,
+  GLIcon,
+  IconBase,
+  JSIcon,
+  TSIcon,
+} from "./icon";
+import { IsVideoFile, IsVideoFileExt } from "~/lib/utils";
 import Link from "next/link";
+import * as runtime from "react/jsx-runtime";
+import { compile, run } from "@mdx-js/mdx";
+import { useMDXComponents } from "mdx-components";
+import type { MDXComponents } from "mdx/types";
+import { api } from "~/trpc/server";
 
-export default function Project({
+export default async function Project({
   id,
-  thumbnail,
+  thumbnailPath,
   title,
-  children,
+  briefPath,
   ghLink,
   languages,
 }: {
   id: number;
-  thumbnail: string;
+  thumbnailPath: string;
   title: string;
+  briefPath: string;
   ghLink?: string;
-  children?: React.ReactNode;
   languages?: Language[];
 }) {
+  const thumbnail = await fetch(thumbnailPath);
+  const images = await api.project.getProjectImages(id);
+  const res = await fetch(briefPath);
+  const markdown = await res.text();
+
+  const code = String(
+    await compile(markdown, { outputFormat: "function-body" }),
+  );
+
+  const CustomComponents: MDXComponents = useMDXComponents();
+
+  // @ts-expect-error: `runtime` types are currently broken.
+  const { default: MDXContent } = await run(code, {
+    ...runtime,
+    baseUrl: import.meta.url,
+  });
+
+  if (!markdown) {
+    return <></>;
+  }
+
   return (
     <div className="flex w-11/12 justify-center">
-      <Link href={`./projects/${id}`} className="pointer-events-none">
-        <div className="flex w-full flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
-          <div className="relative aspect-square w-full max-w-full flex-none md:w-[30%]">
-            {IsVideoFileExt(thumbnail) ? (
-              <video
-                src={thumbnail}
-                autoPlay={true}
-                loop={true}
-                controls={false}
-                muted={true}
-                className="rounded-xl object-cover"
-              ></video>
-            ) : (
-              <Image
-                src={thumbnail}
-                alt="Project showcase picture"
-                fill={true}
-                className="rounded-xl object-cover"
-              />
-            )}
+      <div className="flex w-full flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
+        <div className="relative aspect-square w-full max-w-full flex-none md:w-[30%]">
+          {IsVideoFile(thumbnail) ? (
+            <video
+              src={thumbnailPath}
+              autoPlay={true}
+              loop={true}
+              controls={false}
+              muted={true}
+              className="rounded-xl object-cover"
+            ></video>
+          ) : (
+            <Image
+              src={thumbnailPath}
+              alt="Project showcase picture"
+              fill={true}
+              className="rounded-xl object-cover"
+            />
+          )}
+        </div>
+        <div className="flex flex-grow flex-col flex-wrap gap-2">
+          <div className="flex justify-between gap-2 border-b border-white text-[2rem] font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
+            {title}
           </div>
-          <div className="flex flex-col flex-wrap gap-2">
-            <div className="flex justify-between gap-2 border-b border-white text-[2rem] font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
-              {title}
+          <div className="flex flex-grow flex-col justify-between break-words text-accent">
+            <div className="">
+              <MDXContent
+                components={{ ...CustomComponents }}
+                thumbnail={thumbnail}
+                languages={languages}
+                images={images.map((img) => img.link)}
+              ></MDXContent>
             </div>
-            <div className="flex flex-grow flex-col justify-between break-words text-accent">
-              {children}
-              <div className="block flex justify-start gap-2 self-end">
-                {languages
-                  ? languages.map((language, index) => {
-                      switch (language) {
-                        case Language.CPP:
-                          return (
-                            <IconBase key={index}>
-                              <CPPIcon></CPPIcon>
-                            </IconBase>
-                          );
-                        case Language.JS:
-                          return (
-                            <IconBase key={index}>
-                              <JSIcon></JSIcon>
-                            </IconBase>
-                          );
-                        case Language.OPENGL:
-                          return (
-                            <IconBase key={index}>
-                              <GLIcon></GLIcon>
-                            </IconBase>
-                          );
-                        default:
-                          return null;
-                      }
-                    })
-                  : null}
-                <div className="ml-3 min-w-8 text-center">
-                  {ghLink ? (
-                    <IconBase link={ghLink}>
-                      <GHIcon></GHIcon>
-                    </IconBase>
-                  ) : null}
-                </div>
+            <div className="block flex justify-start gap-2 self-end">
+              {languages
+                ? languages.map((language, index) => {
+                    switch (language) {
+                      case Language.C:
+                        return (
+                          <IconBase key={index}>
+                            <CIcon></CIcon>
+                          </IconBase>
+                        );
+                      case Language.CPP:
+                        return (
+                          <IconBase key={index}>
+                            <CPPIcon></CPPIcon>
+                          </IconBase>
+                        );
+                      case Language.JS:
+                        return (
+                          <IconBase key={index}>
+                            <JSIcon></JSIcon>
+                          </IconBase>
+                        );
+                      case Language.OPENGL:
+                        return (
+                          <IconBase key={index}>
+                            <GLIcon></GLIcon>
+                          </IconBase>
+                        );
+                      case Language.TS:
+                        return (
+                          <IconBase key={index}>
+                            <TSIcon></TSIcon>
+                          </IconBase>
+                        );
+                      default:
+                        return null;
+                    }
+                  })
+                : null}
+              <div className="ml-3 min-w-8 text-center">
+                {ghLink ? (
+                  <IconBase link={ghLink}>
+                    <GHIcon></GHIcon>
+                  </IconBase>
+                ) : null}
               </div>
             </div>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

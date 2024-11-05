@@ -29,3 +29,7 @@ export function GetUTKeyFromURL(url: string) {
 export function IsAdmin(session: Session | null) {
   return session && session.user?.email === "amt1309@gmail.com";
 }
+
+export function IsVideoFile(file: Response) {
+  return file.headers.get("content-type")?.includes("video");
+}

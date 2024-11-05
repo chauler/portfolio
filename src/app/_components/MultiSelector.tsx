@@ -130,6 +130,9 @@ export default React.memo(MultiSelector, (oldProps, newProps) => {
     if (oldLanguages[i]?.value !== newLanguages[i]?.value) {
       return false;
     }
+    if (oldLanguages[i]?.selected !== newLanguages[i]?.selected) {
+      return false;
+    }
   }
   return true;
 });
