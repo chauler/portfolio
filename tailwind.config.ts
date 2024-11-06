@@ -19,6 +19,12 @@ const config = {
     "rounded-xl",
     "pt-8",
     "pb-8",
+    "flex",
+    "gap-2",
+    "ml-8",
+    "w-1/2",
+    "flex-grow",
+    // { pattern: /./ },
   ],
   prefix: "",
   theme: {

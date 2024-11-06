@@ -8,20 +8,21 @@ import {
   type ChangeEvent,
   type ReactNode,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { Language } from "~/types/language-icons";
 import { api } from "~/trpc/react";
-import { ModifyMarkdown } from "../_actions/ModifyMarkdownAction";
 import { SubmitProject } from "../_actions/SubmitProjectAction";
 import MultipleFileUpload from "./MultipleFileUpload";
 import { useDebounce } from "~/lib/clientutils";
 import MultiSelector from "./MultiSelector";
 import LoadingSymbol from "./LoadingSymbol";
-import * as schema from "~/db/schema";
+import type * as schema from "~/db/schema";
 import Image from "next/image";
+import { ErrorBoundary } from "react-error-boundary";
 
 type ReactMDXContent = (props: MDXProps) => ReactNode;
 type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
@@ -57,7 +58,7 @@ export default function ProjectEditor({
     );
   }, 1000);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const abortController = new AbortController();
 
     //Either project hasn't loaded yet or user selected New Project
@@ -67,18 +68,19 @@ export default function ProjectEditor({
       }
       setThumbnail(undefined);
       setSource("");
-      void evaluate("", runtime).then((res) =>
-        setMdxContent(() => res.default),
-      );
+      setBrief("");
+      evaluate("", runtime)
+        .then((res) => setMdxContent(() => res.default))
+        .catch((err) => console.log(err));
     } else {
       void fetch(projectQuery.data?.contentPath, {
         signal: abortController.signal,
       }).then((res) =>
         res.text().then((res) => {
           setSource(res);
-          return evaluate(res, runtime).then((res) =>
-            setMdxContent(() => res.default),
-          );
+          return evaluate(res, runtime)
+            .then((res) => setMdxContent(() => res.default))
+            .catch((err) => console.log(err));
         }),
       );
       fetch(projectQuery.data?.briefPath)
@@ -144,12 +146,11 @@ export default function ProjectEditor({
     };
   }, [projectQuery.data, selectedID]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const abortController = new AbortController();
 
-    setImages([]);
-
     if (imagesQuery.data) {
+      setImages([]);
       for (const image of imagesQuery.data) {
         void fetch(image.link, { signal: abortController.signal })
           .then((response) => {
@@ -205,12 +206,16 @@ export default function ProjectEditor({
     <div className="flex h-full gap-4 px-2 text-white">
       <main className="flex h-fit min-h-fit w-[60%] max-w-[60%] flex-col items-center justify-center rounded-3xl bg-white/5 pl-8 pr-8 text-white">
         <div className="flex w-11/12 flex-grow-0 flex-col py-16">
-          <MdxContent
-            components={CustomComponents}
-            thumbnail={projectQuery.data?.thumbnailPath}
-            languages={projectQuery.data?.languages}
-            images={imagesQuery.data?.map((img) => img.link)}
-          ></MdxContent>
+          <ErrorBoundary
+            fallback={<div>Something went wrong! Try refreshing the page.</div>}
+          >
+            <MdxContent
+              components={CustomComponents}
+              thumbnail={projectQuery.data?.thumbnailPath ?? ""}
+              languages={projectQuery.data?.languages ?? []}
+              images={imagesQuery.data?.map((img) => img.link) ?? []}
+            ></MdxContent>
+          </ErrorBoundary>
         </div>
       </main>
       <div className="border border-white"></div>
@@ -338,7 +343,7 @@ export default function ProjectEditor({
           <MultipleFileUpload
             name="Images"
             className=""
-            // defaultValue={images ? images : undefined}
+            defaultValue={images ? images : undefined}
           ></MultipleFileUpload>
           <div>
             <br></br>

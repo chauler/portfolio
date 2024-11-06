@@ -18,8 +18,9 @@ export default async function Home() {
             at the University of Nebraska-Omaha.
           </h2>
           <h2 className="mt-[-2rem] max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
-            I have experience working in C/C++ in a research lab setting, and I
-            also use TypeScript/Python/React for my projects.
+            I have a wide breadth of experience: working in C/C++ in a research
+            lab, full stack development with TypeScript/React, and desktop
+            applications in Python, among others.
           </h2>
           <div className="py-4 sm:py-16"></div>
           <div className="flex w-full flex-col items-center justify-center gap-8 bg-slate-50/[0.05] py-8">
