@@ -77,7 +77,9 @@ export default async function Project({
         </div>
         <div className="flex flex-grow flex-col flex-wrap gap-2">
           <div className="flex justify-between gap-2 border-b border-white text-[2rem] font-bold leading-tight tracking-tight text-accent sm:text-[3rem]">
-            {title}
+            <a className="hover:underline" href={`/projects/${id}`}>
+              {title}
+            </a>
           </div>
           <div className="flex flex-grow flex-col justify-between break-words text-accent">
             <div className="">

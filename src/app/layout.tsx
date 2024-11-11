@@ -68,7 +68,7 @@ export default async function RootLayout({
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link
-                  href="https://utfs.io/f/hbsTnyPlc753b8XKjI36e9R2DzFCSyxYWMfcaXk4ilQg1HKT"
+                  href="https://utfs.io/f/hbsTnyPlc753cJWLU0bzqFVbw6gxWRvYX12sHT7dkmUPpfKa"
                   target="_blank"
                 >
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
