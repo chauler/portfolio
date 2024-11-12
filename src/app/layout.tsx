@@ -38,58 +38,65 @@ export default async function RootLayout({
     <html lang="en" className={`${GeistSans.variable} bg-black`}>
       <body
         className={cn(
-          "min-h-screen bg-black/90 font-sans antialiased backdrop-blur-[80px]",
+          "bg-transparent font-sans antialiased",
           fontSans.variable,
         )}
       >
-        <TRPCReactProvider>
-          <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-transparent filter">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul>
-                    {projects
-                      ? projects.map((project, index) => (
-                          <li key={index}>
-                            <NavigationMenuLink>
-                              <Link
-                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                                href={`/projects/${project.id}`}
-                              >
-                                {project.title}
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                        ))
-                      : null}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link
-                  href="https://utfs.io/f/hbsTnyPlc753cJWLU0bzqFVbw6gxWRvYX12sHT7dkmUPpfKa"
-                  target="_blank"
-                >
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Resume
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/">
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Home
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+        <BackgroundCanvas></BackgroundCanvas>
 
-          {children}
-        </TRPCReactProvider>
+        <div className="h-full bg-black/90 backdrop-blur-2xl">
+          <TRPCReactProvider>
+            <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-transparent filter">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul>
+                      {projects
+                        ? projects.map((project, index) => (
+                            <li key={index}>
+                              <NavigationMenuLink>
+                                <Link
+                                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                  href={`/projects/${project.id}`}
+                                >
+                                  {project.title}
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                          ))
+                        : null}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link
+                    href="https://utfs.io/f/hbsTnyPlc753cJWLU0bzqFVbw6gxWRvYX12sHT7dkmUPpfKa"
+                    target="_blank"
+                  >
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Resume
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/">
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Home
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            {children}
+          </TRPCReactProvider>
+        </div>
       </body>
-      <BackgroundCanvas></BackgroundCanvas>
     </html>
   );
 }

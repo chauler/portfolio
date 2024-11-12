@@ -54,7 +54,7 @@ export default async function Project({
   }
 
   return (
-    <div className="flex w-11/12 justify-center">
+    <div className="flex w-11/12 justify-center transition hover:scale-[101%]">
       <div className="flex w-full flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20 md:flex-row">
         <div className="relative aspect-square w-full max-w-full flex-none md:w-[30%]">
           {IsVideoFile(thumbnail) ? (

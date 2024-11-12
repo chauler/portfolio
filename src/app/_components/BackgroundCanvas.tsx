@@ -4,14 +4,10 @@ import { useState } from "react";
 
 export default function BackgroundCanvas() {
   return (
-    <>
-      {
-        //The encompassing div has its height/width and positions set so that there is space for the svg filters to bleed into. Having the container cut off at the screen affects the blurring
-      }
-      <div className="fixed right-[-5vh] top-[-5vh] z-[-1] min-h-[110vh] w-[110vw] overflow-hidden [filter:url('#fancy-goo')]">
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
+    //The encompassing div has its height/width and positions set so that there is space for the svg filters to bleed into. Having the container cut off at the screen affects the blurring
+
+    <div className="fixed h-screen w-screen overflow-hidden">
+      <div className="absolute right-[10vw] top-[-5vh] z-[-1] min-h-[110vh] w-[110vw] overflow-visible [filter:url('#fancy-goo')]">
         <Cell></Cell>
         <Cell></Cell>
         <Cell></Cell>
@@ -42,18 +38,18 @@ export default function BackgroundCanvas() {
           </filter>
         </defs>
       </svg>
-    </>
+    </div>
   );
 }
 
 function Cell() {
   const [left, setLeft] = useState(Math.random() * 100);
   const [top, setTop] = useState(Math.random() * 100);
-  const [duration, setDuration] = useState(Math.random() * 35 + 30);
+  const [duration, setDuration] = useState(Math.random() * 25 + 30);
 
   return (
     <motion.div
-      className="absolute h-[36rem] w-[36rem] rounded-full bg-white"
+      className="absolute aspect-square w-[max(36rem,20%)] rounded-full bg-white"
       initial={{
         left: `${Math.random() * 100}%`,
         top: `${Math.random() * 100}%`,
@@ -67,8 +63,9 @@ function Cell() {
         const newLeft = Math.random() * 100;
         const newTop = Math.random() * 100;
         //All durations are calculated relative to the length travelled during the animation in order to keep velocities equal.
-        //Calculate hypotenuse (range of 0-141), divide by 4 (range 0-35), add 30 (range 35-65)
-        const newDuration = Math.hypot(newLeft - left, newTop - top) / 4 + 30;
+        //Calculate hypotenuse (range of 0-141), divide by 4 (range 0-35), add 30 (range 25-55)
+        const newDuration =
+          Math.hypot(newLeft - left, newTop - top) / 5.64 + 30;
         setDuration(newDuration);
         setLeft(newLeft);
         setTop(newTop);
