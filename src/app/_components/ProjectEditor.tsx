@@ -46,7 +46,7 @@ export default function ProjectEditor({
   const imagesQuery = api.project.getProjectImages.useQuery(selectedID);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [thumbnail, setThumbnail] = useState<File>();
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<{ id: number; file: File }[]>([]);
   const [source, setSource] = useState("");
   const [brief, setBrief] = useState("");
   const [pending, setPending] = useState(false);
@@ -190,9 +190,11 @@ export default function ProjectEditor({
             stream: await response.stream.blob(),
           }))
           .then(
-            (blob) => new File([blob.stream], "test.mp4", { type: blob.type }),
+            (blob) => new File([blob.stream], image.name, { type: blob.type }),
           )
-          .then((image) => setImages((i) => [...i, image]))
+          .then((newImage) =>
+            setImages((i) => [...i, { id: image.id, file: newImage }]),
+          )
           .catch((err) => console.error(err));
       }
     }
@@ -343,7 +345,11 @@ export default function ProjectEditor({
           <MultipleFileUpload
             name="Images"
             className=""
-            defaultValue={images ? images : undefined}
+            defaultValue={
+              images
+                ? images.sort((a, b) => a.id - b.id).map((image) => image.file)
+                : undefined
+            }
           ></MultipleFileUpload>
           <div>
             <br></br>

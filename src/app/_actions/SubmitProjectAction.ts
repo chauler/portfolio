@@ -140,6 +140,7 @@ export async function SubmitProject(
   const imagesToUpload: InsertImage[] = imagesResponse.map((result) => ({
     link: `https://utfs.io/f/${result.data?.key}`,
     postID: postID,
+    name: result.data?.name,
   }));
 
   await db
