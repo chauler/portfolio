@@ -7,7 +7,7 @@ export default function BackgroundCanvas() {
     //The encompassing div has its height/width and positions set so that there is space for the svg filters to bleed into. Having the container cut off at the screen affects the blurring
 
     <div className="fixed h-screen w-screen overflow-hidden">
-      <div className="absolute right-[10vw] top-[-5vh] z-[-1] min-h-[110vh] w-[110vw] overflow-visible [filter:url('#fancy-goo')]">
+      <div className="absolute bottom-[10vh] right-[10vw] z-[-1] min-h-[110vh] w-[110vw] overflow-visible [filter:url('#fancy-goo')]">
         <Cell></Cell>
         <Cell></Cell>
         <Cell></Cell>
@@ -49,7 +49,7 @@ function Cell() {
 
   return (
     <motion.div
-      className="absolute aspect-square w-[max(36rem,20%)] rounded-full bg-white"
+      className="absolute aspect-square w-[max(24rem,25%)] rounded-full bg-white"
       initial={{
         left: `${Math.random() * 100}%`,
         top: `${Math.random() * 100}%`,

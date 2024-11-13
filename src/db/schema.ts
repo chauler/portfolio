@@ -24,6 +24,7 @@ export const imagesTable = sqliteTable("images", {
     .references(() => postsTable.id)
     .notNull(),
   link: text("link").notNull(),
+  name: text("name").notNull().default("test.mp4"),
 });
 
 export type InsertPost = typeof postsTable.$inferInsert;
