@@ -3,6 +3,7 @@ import { HydrateClient } from "~/trpc/server";
 import Header from "./_components/Header";
 import Project from "./_components/Project";
 import { api } from "~/trpc/server";
+import SkillsContainer from "./_components/SkillsContainer";
 
 export default async function Home() {
   const projects = await api.project.getProjects();
@@ -11,17 +12,18 @@ export default async function Home() {
     <HydrateClient>
       <main className="flex min-h-full flex-col items-center justify-center text-white">
         <div className="flex w-full flex-col items-center justify-center gap-12 py-16">
-          <Header>Hey, I&apos;m Alex.</Header>
+          <Header>Alex Tomjack</Header>
           <h2 className="max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
             I&apos;m Alex Tomjack, a computer science graduate from the
             University of North Texas, currently studying for my master&apos;s
             at the University of Nebraska-Omaha.
           </h2>
           <h2 className="mt-[-2rem] max-w-3xl px-4 text-left indent-12 text-lg font-bold leading-none tracking-tight md:text-2xl">
-            I have a wide breadth of experience: working in C/C++ in a research
-            lab, full stack development with TypeScript/React, and desktop
-            applications in Python, among others.
+            I mainly do full-stack web development, with a focus on TypeScript.
+            However, I also work on whatever interests me, so I have experience
+            in many languages and technologies.
           </h2>
+          <SkillsContainer></SkillsContainer>
           <div className="py-4 sm:py-16"></div>
           <div className="flex w-full flex-col items-center justify-center gap-8 bg-slate-50/[0.05] py-8">
             <Header>Projects</Header>
