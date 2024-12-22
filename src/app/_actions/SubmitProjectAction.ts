@@ -164,4 +164,5 @@ export async function SubmitProject(
       }),
     );
   }
+  console.log("Finished posting");
 }
