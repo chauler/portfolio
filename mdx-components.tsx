@@ -37,10 +37,11 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
     ),
     Image: (props) => (
       <Image
-        {...props}
         width={500}
         height={500}
-        objectFit="fill"
+        {...props}
+        quality={100}
+        objectFit="contain"
         alt="test"
       ></Image>
     ),
