@@ -49,7 +49,7 @@ export default async function Home() {
             <div className="flex flex-col gap-12 sm:flex-row">
               <Link
                 className="flex max-w-xs justify-between gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-                href="https://utfs.io/f/hbsTnyPlc753IRbJfQZJqv3UE0LCyokrcYlKRiPGaBAMn9fO"
+                href="https://utfs.io/f/hbsTnyPlc753uyaabcXGmMfx5oLSqCX7eiOwtcI60ZdGPQJA"
                 target="_blank"
               >
                 <h3 className="text-2xl font-bold">Resume →</h3>

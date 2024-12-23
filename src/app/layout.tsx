@@ -71,7 +71,7 @@ export default async function RootLayout({
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link
-                    href="https://utfs.io/f/hbsTnyPlc753IRbJfQZJqv3UE0LCyokrcYlKRiPGaBAMn9fO"
+                    href="https://utfs.io/f/hbsTnyPlc753uyaabcXGmMfx5oLSqCX7eiOwtcI60ZdGPQJA"
                     target="_blank"
                   >
                     <NavigationMenuLink
