@@ -39,7 +39,7 @@ export function GetUTKeyFromURL(url: string) {
 }
 
 export function IsAdmin(session: Session | null) {
-  return session && session.user?.email === "amt1309@gmail.com";
+  return session && session.user?.role === "Admin";
 }
 
 export function IsVideoFile(file: Response) {

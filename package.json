@@ -13,7 +13,8 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@libsql/client": "^0.10.0",
+    "@auth/drizzle-adapter": "^1.7.4",
+    "@libsql/client": "^0.14.0",
     "@mdx-js/loader": "^3.0.1",
     "@next/mdx": "^14.2.7",
     "@radix-ui/react-navigation-menu": "^1.2.0",

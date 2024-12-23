@@ -20,10 +20,4 @@ export default async function Projects() {
       <div className="text-white">Not Authenticated - Administrator only</div>
     </>
   );
-
-  return (
-    <HydrateClient>
-      <main className="flex min-h-full flex-col items-center justify-center text-white"></main>
-    </HydrateClient>
-  );
 }
