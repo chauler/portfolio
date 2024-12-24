@@ -6,7 +6,7 @@ import type { MDXComponents, MDXProps } from "mdx/types";
 import {
   type ChangeEvent,
   type ReactNode,
-  useEffect,
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -23,6 +23,8 @@ import type * as schema from "~/db/schema";
 import Image from "next/image";
 import { ErrorBoundary } from "react-error-boundary";
 import { useUploadThing } from "~/lib/uploadthing";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type ReactMDXContent = (props: MDXProps) => ReactNode;
 type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
@@ -50,11 +52,25 @@ export default function ProjectEditor({
   });
   const CustomComponents: MDXComponents = useMDXComponents();
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const updateSearchParams = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [searchParams, pathname, router],
+  );
+
   //State for existing project editor
   const [MdxContent, setMdxContent] = useState<ReactMDXContent>(
     () => () => null,
   );
-  const [selectedID, setSelectedID] = useState(projects[0]?.id ?? 0);
+  const [selectedID, setSelectedID] = useState(
+    parseInt(searchParams.get("id") ?? "0"),
+  );
   const projectQuery = api.project.getProject.useQuery(selectedID);
   const imagesQuery = api.project.getProjectImages.useQuery(selectedID);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -163,53 +179,62 @@ export default function ProjectEditor({
     const abortController = new AbortController();
 
     if (imagesQuery.data) {
-      setImages([]);
-      for (const image of imagesQuery.data) {
-        void fetch(image.link, { signal: abortController.signal })
-          .then((response) => {
-            if (!response.body) return;
-            const reader = response.body.getReader();
-            return {
-              type: response.headers.get("content-type"),
-              stream: new ReadableStream({
-                start(controller) {
-                  return pump();
-                  function pump() {
-                    return reader
-                      .read()
-                      .then(({ done, value }): Promise<void> | void => {
-                        // When no more data needs to be consumed, close the stream
-                        if (done) {
-                          controller.close();
-                          return;
-                        }
-                        // Enqueue the next data chunk into our target stream
-                        controller.enqueue(value);
-                        return pump();
-                      });
-                  }
-                },
-              }),
-            };
-          })
-          // Create a new response out of the stream
-          .then((stream) => ({
-            type: stream?.type,
-            stream: new Response(stream?.stream),
-          }))
-          // Create an object URL for the response
-          .then(async (response) => ({
-            type: response.type ?? "",
-            stream: await response.stream.blob(),
-          }))
-          .then(
-            (blob) => new File([blob.stream], image.name, { type: blob.type }),
-          )
-          .then((newImage) =>
-            setImages((i) => [...i, { id: image.id, file: newImage }]),
-          )
-          .catch((err) => console.error(err));
-      }
+      Promise.all(
+        imagesQuery.data.map((image) => {
+          return (
+            fetch(image.link, { signal: abortController.signal })
+              .then((response) => {
+                if (!response.body) return;
+                const reader = response.body.getReader();
+                return {
+                  type: response.headers.get("content-type"),
+                  stream: new ReadableStream({
+                    start(controller) {
+                      return pump();
+                      function pump() {
+                        return reader
+                          .read()
+                          .then(({ done, value }): Promise<void> | void => {
+                            // When no more data needs to be consumed, close the stream
+                            if (done) {
+                              controller.close();
+                              return;
+                            }
+                            // Enqueue the next data chunk into our target stream
+                            controller.enqueue(value);
+                            return pump();
+                          });
+                      }
+                    },
+                  }),
+                };
+              })
+              // Create a new response out of the stream
+              .then((stream) => ({
+                type: stream?.type,
+                stream: new Response(stream?.stream),
+              }))
+              // Create an object URL for the response
+              .then(async (response) => ({
+                type: response.type ?? "",
+                stream: await response.stream.blob(),
+              }))
+              .then((blob) => ({
+                id: image.id,
+                file: new File([blob.stream], image.name, { type: blob.type }),
+              }))
+              .catch((err) => {
+                console.error(err);
+                return undefined;
+              })
+          );
+        }),
+      )
+        .then((result) => {
+          setImages(result.filter((image) => image !== undefined));
+          console.log(result);
+        })
+        .catch((err) => console.error(err));
     }
 
     return () => {
@@ -243,9 +268,10 @@ export default function ProjectEditor({
           id="project"
           name="projectID"
           className="rounded-xl bg-white/10 p-2 hover:bg-white/30"
-          defaultValue={projects[0]?.id ?? 0}
+          defaultValue={selectedID}
           onChange={(e) => {
             setSelectedID(parseInt(e.target.value));
+            updateSearchParams("id", e.target.value);
           }}
         >
           {projects.map((project) => (
