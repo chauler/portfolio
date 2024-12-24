@@ -1,6 +1,5 @@
 "use client";
 
-import { type Session } from "next-auth";
 import { evaluate, type EvaluateOptions } from "@mdx-js/mdx";
 import { useMDXComponents } from "mdx-components";
 import type { MDXComponents, MDXProps } from "mdx/types";
@@ -23,18 +22,32 @@ import LoadingSymbol from "./LoadingSymbol";
 import type * as schema from "~/db/schema";
 import Image from "next/image";
 import { ErrorBoundary } from "react-error-boundary";
+import { useUploadThing } from "~/lib/uploadthing";
 
 type ReactMDXContent = (props: MDXProps) => ReactNode;
 type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
 const runtime = { jsx, jsxs, Fragment } as Runtime;
 
 export default function ProjectEditor({
-  session,
   projects,
 }: {
-  session: Session | null;
   projects: schema.SelectPost[];
 }) {
+  const { startUpload } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      console.log("Uploading", files.length, "files");
+      return files;
+    },
+    onUploadBegin: (name) => {
+      console.log("Beginning upload of", name);
+    },
+    onClientUploadComplete: (res) => {
+      console.log("Upload Completed.", res.length, "files uploaded");
+    },
+    onUploadProgress(p) {
+      console.log("onUploadProgress", p);
+    },
+  });
   const CustomComponents: MDXComponents = useMDXComponents();
 
   //State for existing project editor
@@ -357,7 +370,39 @@ export default function ProjectEditor({
           <button
             type="submit"
             formAction={async (formData) => {
-              await SubmitProject(formData, session);
+              const images = formData.getAll("Images");
+              const thumbnail = formData.get("Thumbnail");
+              //This field is required so should never be undefined - this is for the TS linter
+              if (!thumbnail) {
+                return;
+              }
+
+              //Get all file contents and upload direct to storage. Get keys and send those to DB
+              const [imageKeys, thumbnailKey] = await Promise.all([
+                images.length > 0 ? startUpload(images as File[]) : undefined,
+                startUpload([thumbnail as File]),
+              ]);
+              formData.delete("Images");
+              formData.delete("Thumbnail");
+
+              if (images.length > 0 && imageKeys) {
+                imageKeys.forEach((image) => {
+                  formData.append("Images", image.key);
+                  formData.append("ImageNames", image.name);
+                });
+              } else {
+                console.log("Failed to upload images");
+              }
+
+              if (thumbnailKey) {
+                thumbnailKey.forEach((image) =>
+                  formData.append("Thumbnail", image.key),
+                );
+              } else {
+                console.log("Failed to upload thumbnail");
+              }
+
+              await SubmitProject(formData);
             }}
           >
             Submit

@@ -12,7 +12,7 @@ export default async function Projects() {
 
   return IsAdmin(session) ? (
     <HydrateClient>
-      <ProjectEditor session={session} projects={projects}></ProjectEditor>
+      <ProjectEditor projects={projects}></ProjectEditor>
     </HydrateClient>
   ) : (
     <>

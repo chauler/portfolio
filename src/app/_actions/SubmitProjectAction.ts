@@ -4,49 +4,32 @@ import { utapi } from "~/server/uploadthing";
 import { db } from "~/db";
 import {
   imagesTable,
-  InsertImage,
+  type InsertImage,
   type InsertPost,
   postsTable,
 } from "~/db/schema";
 import { Language } from "~/types/language-icons";
-import { GetUTKeyFromURL, IsAdmin } from "~/lib/utils";
-import { Session } from "next-auth";
-import * as schema from "@/db/schema";
+import { GetUTKeyFromURL, IsAdmin, UtURLFromKey } from "~/lib/utils";
+import type * as schema from "@/db/schema";
 import { eq } from "drizzle-orm";
-
-const MAX_FILE_SIZE = 10000000;
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-  "video/webm",
-  "video/mp4",
-];
+import { auth } from "~/auth/auth";
 
 const ProjectFormData = z.object({
   projectID: z.number(),
   title: z.string().min(1),
   brief: z.string().min(1),
   content: z.string().min(1),
-  thumbnail: z
-    .instanceof(File)
-    .refine((file) => file.size >= 1 && file.size <= MAX_FILE_SIZE)
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
+  thumbnail: z.string().min(1),
   ghLink: z.string(),
   languages: z.nativeEnum(Language).array(),
-  images: z
-    .instanceof(File)
-    .refine((file) => file.size >= 1 && file.size <= MAX_FILE_SIZE)
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type))
-    .array(),
+  images: z.string().min(1).array(),
+  imageNames: z.string().min(1).array(),
 });
 
-export async function SubmitProject(
-  formData: FormData,
-  session: Session | null,
-) {
+export async function SubmitProject(formData: FormData) {
+  const session = await auth();
   if (!IsAdmin(session)) {
+    console.log("Not authenticated");
     return { errors: "Not authenticated" };
   }
 
@@ -58,9 +41,8 @@ export async function SubmitProject(
     thumbnail: formData.get("Thumbnail"),
     ghLink: formData.get("ghLink"),
     languages: formData.getAll("Languages"),
-    images: formData
-      .getAll("Images")
-      .filter((image) => (image instanceof File ? image.size > 0 : 0)),
+    images: formData.getAll("Images"),
+    imageNames: formData.getAll("ImageNames"),
   });
 
   if (!validatedInput.success) {
@@ -72,6 +54,7 @@ export async function SubmitProject(
     };
   }
 
+  //Grab existing db entries if we are updating a post
   let existingData: schema.SelectPost | undefined;
   let existingImages: schema.SelectImage[] | undefined;
   if (validatedInput.data.projectID) {
@@ -86,6 +69,7 @@ export async function SubmitProject(
     }
   }
 
+  //Turn the text content into files for storage on UT
   const content = new File(
     [new Blob([validatedInput.data.content])],
     "content.mdx",
@@ -96,23 +80,15 @@ export async function SubmitProject(
     type: "application/octet-stream",
   });
 
-  const responses = await Promise.all([
-    utapi.uploadFiles([content, validatedInput.data.thumbnail, brief]),
-    utapi.uploadFiles(validatedInput.data.images),
-  ]);
+  const response = await utapi.uploadFiles([brief, content]);
 
-  for (const response of responses) {
-    for (const result of response) {
-      if (result.error) {
-        return {
-          errors: "Failed to upload file",
-        };
-      }
+  for (const result of response) {
+    if (result.error) {
+      return {
+        errors: "Failed to upload file",
+      };
     }
   }
-
-  const postResponse = responses[0];
-  const imagesResponse = responses[1];
 
   const dataToUpload: InsertPost = {
     id:
@@ -120,9 +96,9 @@ export async function SubmitProject(
         ? validatedInput.data.projectID
         : undefined,
     title: validatedInput.data.title,
-    briefPath: `https://utfs.io/f/${postResponse[2]?.data?.key}`,
-    contentPath: `https://utfs.io/f/${postResponse[0]?.data?.key}`,
-    thumbnailPath: `https://utfs.io/f/${postResponse[1]?.data?.key}`,
+    briefPath: `${UtURLFromKey(response[0]?.data?.key ?? "")}`,
+    contentPath: `${UtURLFromKey(response[1]?.data?.key ?? "")}`,
+    thumbnailPath: `${UtURLFromKey(validatedInput.data.thumbnail)}`,
     ghLink: validatedInput.data.ghLink,
     languages: { languages: validatedInput.data.languages },
   };
@@ -135,31 +111,41 @@ export async function SubmitProject(
       set: { ...dataToUpload },
     })
     .returning({ id: postsTable.id });
+
+  //Stop early if we couldn't successfully insert to avoid doing anything dangerous
   if (!insertedPosts[0]?.id) return;
+
   const postID = insertedPosts[0].id;
-  const imagesToUpload: InsertImage[] = imagesResponse.map((result) => ({
-    link: `https://utfs.io/f/${result.data?.key}`,
-    postID: postID,
-    name: result.data?.name,
-  }));
+  const imagesToUpload: InsertImage[] = validatedInput.data.images.map(
+    (imageKey, i) => ({
+      link: `${UtURLFromKey(imageKey)}`,
+      postID: postID,
+      name: validatedInput.data.imageNames[i],
+    }),
+  );
 
-  await db
-    .delete(imagesTable)
-    .where(eq(imagesTable.postID, validatedInput.data.projectID));
-  if (imagesToUpload.length > 0)
-    await db.insert(imagesTable).values(imagesToUpload);
+  const imageInsertResult = imagesToUpload.length
+    ? await db.transaction(async (tx) => {
+        await tx
+          .delete(imagesTable)
+          .where(eq(imagesTable.postID, validatedInput.data.projectID));
+        return await tx.insert(imagesTable).values(imagesToUpload);
+      })
+    : undefined;
 
-  if (existingData) {
+  //We are updating an existing post and successfully uploaded the new content. Delete the old
+  if (existingData && insertedPosts.length > 0) {
     await utapi.deleteFiles([
       GetUTKeyFromURL(existingData.contentPath),
       GetUTKeyFromURL(existingData.thumbnailPath),
       GetUTKeyFromURL(existingData.briefPath),
     ]);
   }
-  if (existingImages) {
+
+  //Same with images: delete as long as we successfully uploaded the new ones
+  if (existingImages && imageInsertResult?.rowsAffected) {
     await utapi.deleteFiles(
       existingImages.map((image) => {
-        console.log(GetUTKeyFromURL(image.link));
         return GetUTKeyFromURL(image.link);
       }),
     );

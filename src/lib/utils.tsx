@@ -38,6 +38,10 @@ export function GetUTKeyFromURL(url: string) {
   return url.replace("https://utfs.io/f/", "");
 }
 
+export function UtURLFromKey(key: string) {
+  return "https://utfs.io/f/" + key;
+}
+
 export function IsAdmin(session: Session | null) {
   return session && session.user?.role === "Admin";
 }
