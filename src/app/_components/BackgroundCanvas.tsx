@@ -6,20 +6,22 @@ export default function BackgroundCanvas() {
   return (
     //The encompassing div has its height/width and positions set so that there is space for the svg filters to bleed into. Having the container cut off at the screen affects the blurring
 
-    <div className="fixed h-screen w-screen overflow-hidden">
-      <div className="absolute bottom-[10vh] right-[10vw] z-[-1] min-h-[110vh] w-[110vw] overflow-visible [filter:url('#fancy-goo')]">
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
-        <Cell></Cell>
+    <div className="fixed -z-10 h-screen w-screen overflow-hidden blur-3xl">
+      <div className="h-full w-full bg-black/90">
+        <div className="absolute bottom-[10vh] right-[10vw] z-[-1] min-h-[110vh] w-[110vw] overflow-visible [filter:url('#fancy-goo')]">
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+        </div>
       </div>
       <svg className="h-0 w-0">
         <defs>

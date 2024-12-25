@@ -44,7 +44,7 @@ export default async function RootLayout({
       >
         <BackgroundCanvas></BackgroundCanvas>
 
-        <div className="h-full bg-black/90 backdrop-blur-3xl">
+        <div className="h-full">
           <TRPCReactProvider>
             <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-transparent filter">
               <NavigationMenuList>
