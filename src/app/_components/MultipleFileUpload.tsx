@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import {
   useState,
   useRef,
@@ -11,12 +12,14 @@ import { cn } from "~/lib/utils";
 interface Props
   extends Omit<
     DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-    "multiple" | "type" | "defaultValue"
+    "multiple" | "type" | "defaultValue" | "onChange"
   > {
   defaultValue?: File | File[];
+  onAdd?: (arg0: File[]) => void;
+  onDelete?: (arg0: File[]) => void;
 }
 
-export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
+function MultipleFileUpload({ defaultValue, ...props }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>(
     defaultValue
@@ -34,8 +37,8 @@ export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
     }
   }, [files]);
 
+  //Update files if the provided default changes
   useEffect(() => {
-    console.log("Images changes. Rerendering");
     setFiles(
       defaultValue
         ? Array.isArray(defaultValue)
@@ -54,18 +57,23 @@ export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
         type="file"
         name={props.name}
         onChange={(e) => {
-          setFiles(
+          //If we selected a file and it's not a duplicate, add it to the list and call onChange if provided by parent
+          if (
             e.target.files?.[0] &&
-              !files.find(
-                (file) =>
-                  file.name === e.target.files![0]?.name &&
-                  file.size === e.target.files![0]?.size,
-              )
-              ? [...files, e.target.files[0]]
-              : [...files],
-          );
+            !files.find(
+              (file) =>
+                file.name === e.target.files![0]?.name &&
+                file.size === e.target.files![0]?.size,
+            )
+          ) {
+            const newFiles = [...files, e.target.files[0]];
+            setFiles(newFiles);
+            props.onAdd?.(newFiles);
+          }
         }}
       ></input>
+
+      {/*Display to view/remove current files*/}
       <div className="">
         <p>Files uploaded:</p>
         {files.map((file, index) => (
@@ -75,9 +83,11 @@ export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
             key={index}
             onClick={(event) => {
               const index = event.currentTarget.getAttribute("data-index");
-              setFiles(
-                files.filter((element, i) => index && i !== parseInt(index)),
+              const newFiles = files.filter(
+                (element, i) => index && i !== parseInt(index),
               );
+              setFiles(newFiles);
+              props.onDelete?.(newFiles);
             }}
           >
             X {file.name}
@@ -87,3 +97,26 @@ export default function MultipleFileUpload({ defaultValue, ...props }: Props) {
     </div>
   );
 }
+
+export default React.memo(MultipleFileUpload, (oldProps, newProps) => {
+  let key: keyof Props;
+  for (key in oldProps) {
+    //Deep compare defaultValue if necessary. All other props should be shallow compared
+    if (
+      key === "defaultValue" &&
+      Array.isArray(oldProps.defaultValue) &&
+      Array.isArray(newProps.defaultValue)
+    ) {
+      for (const image of oldProps.defaultValue) {
+        if (!newProps.defaultValue.find((newImage) => newImage === image)) {
+          return false;
+        }
+      }
+    } else {
+      if (oldProps[key] !== newProps[key]) {
+        return false;
+      }
+    }
+  }
+  return true;
+});

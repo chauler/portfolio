@@ -39,10 +39,10 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
       <Image
         width={500}
         height={500}
-        {...props}
         quality={100}
         objectFit="contain"
         alt="test"
+        {...props}
       ></Image>
     ),
     Video: ({

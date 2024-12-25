@@ -75,7 +75,9 @@ export default function ProjectEditor({
   const imagesQuery = api.project.getProjectImages.useQuery(selectedID);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [thumbnail, setThumbnail] = useState<File>();
-  const [images, setImages] = useState<{ id: number; file: File }[]>([]);
+  const [images, setImages] = useState<
+    { id: number; file: File; link: string }[]
+  >([]);
   const [source, setSource] = useState("");
   const [brief, setBrief] = useState("");
   const [pending, setPending] = useState(false);
@@ -222,6 +224,7 @@ export default function ProjectEditor({
               .then((blob) => ({
                 id: image.id,
                 file: new File([blob.stream], image.name, { type: blob.type }),
+                link: image.link,
               }))
               .catch((err) => {
                 console.error(err);
@@ -232,7 +235,6 @@ export default function ProjectEditor({
       )
         .then((result) => {
           setImages(result.filter((image) => image !== undefined));
-          console.log(result);
         })
         .catch((err) => console.error(err));
     }
@@ -241,6 +243,46 @@ export default function ProjectEditor({
       abortController.abort();
     };
   }, [imagesQuery.data, selectedID]);
+
+  const handleAddFile = useCallback(
+    (files: File[]) => {
+      //Take the new image File obj and generate a useable link and ID for use in the MDX so we can provide useful previews with images not yet uploaded to the DB
+      const fileReader = new FileReader();
+      const newFile = files.at(-1);
+      fileReader.onload = () => {
+        if (fileReader.result && newFile) {
+          const newImage = {
+            id: Math.max(...images.map((image) => image.id)) + 1,
+            file: newFile,
+            link:
+              typeof fileReader.result === "string"
+                ? fileReader.result
+                : new TextDecoder().decode(fileReader.result),
+          };
+          setImages((images) => [...images, newImage]);
+        }
+      };
+      if (newFile) {
+        fileReader.readAsDataURL(newFile);
+      }
+    },
+    [images],
+  );
+
+  const handleDeleteFile = useCallback(
+    (files: File[]) => {
+      if (files) {
+        const newImages = images.filter((image) =>
+          files.find(
+            (file) =>
+              file.name === image.file.name && file.size === image.file.size,
+          ),
+        );
+        setImages(newImages);
+      }
+    },
+    [images],
+  );
 
   return (
     <div className="flex h-full gap-4 px-2 text-white">
@@ -253,7 +295,7 @@ export default function ProjectEditor({
               components={CustomComponents}
               thumbnail={projectQuery.data?.thumbnailPath ?? ""}
               languages={projectQuery.data?.languages ?? []}
-              images={imagesQuery.data?.map((img) => img.link) ?? []}
+              images={images.map((img) => img.link) ?? []}
             ></MdxContent>
           </ErrorBoundary>
         </div>
@@ -389,6 +431,8 @@ export default function ProjectEditor({
                 ? images.sort((a, b) => a.id - b.id).map((image) => image.file)
                 : undefined
             }
+            onAdd={handleAddFile}
+            onDelete={handleDeleteFile}
           ></MultipleFileUpload>
           <div>
             <br></br>
