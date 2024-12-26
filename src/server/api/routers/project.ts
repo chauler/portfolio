@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "~/db/index";
-import * as schema from "~/db/schema";
+import type * as schema from "~/db/schema";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const ProjectRouter = createTRPCRouter({
@@ -26,4 +26,11 @@ export const ProjectRouter = createTRPCRouter({
       });
       return images;
     }),
+  getProjectIDs: publicProcedure.query(async () => {
+    return await db.query.postsTable.findMany({
+      columns: {
+        id: true,
+      },
+    });
+  }),
 });

@@ -3,6 +3,15 @@ import * as runtime from "react/jsx-runtime";
 import { compile, run } from "@mdx-js/mdx";
 import { useMDXComponents } from "mdx-components";
 import type { MDXComponents } from "mdx/types";
+import { GetProjectIDs } from "~/app/_actions/GetProjectIDs";
+
+export const revalidate = 600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const projects = await GetProjectIDs();
+  return projects.map((project) => ({ id: project.id.toString() }));
+}
 
 export default async function Page({ params }: { params: { id: string } }) {
   const project = await api.project.getProject(Number.parseInt(params.id));
