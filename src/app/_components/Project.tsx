@@ -9,7 +9,7 @@ import {
   JSIcon,
   TSIcon,
 } from "./icon";
-import { IsVideoFile, IsVideoFileExt } from "~/lib/utils";
+import { IsVideoFile, IsVideoFileExt, LanguageIcon } from "~/lib/utils";
 import Link from "next/link";
 import * as runtime from "react/jsx-runtime";
 import { compile, run } from "@mdx-js/mdx";
@@ -93,42 +93,12 @@ export default async function Project({
             <div className="block flex h-[2.2rem] min-h-8 items-center justify-start gap-2 self-end">
               <div className="flex max-h-[90%] min-w-8 flex-grow gap-2">
                 {languages
-                  ? languages.map((language, index) => {
-                      switch (language) {
-                        case Language.C:
-                          return (
-                            <IconBase key={index}>
-                              <CIcon></CIcon>
-                            </IconBase>
-                          );
-                        case Language.CPP:
-                          return (
-                            <IconBase key={index}>
-                              <CPPIcon></CPPIcon>
-                            </IconBase>
-                          );
-                        case Language.JS:
-                          return (
-                            <IconBase key={index}>
-                              <JSIcon></JSIcon>
-                            </IconBase>
-                          );
-                        case Language.OPENGL:
-                          return (
-                            <IconBase key={index}>
-                              <GLIcon></GLIcon>
-                            </IconBase>
-                          );
-                        case Language.TS:
-                          return (
-                            <IconBase key={index}>
-                              <TSIcon></TSIcon>
-                            </IconBase>
-                          );
-                        default:
-                          return null;
-                      }
-                    })
+                  ? languages.map((language, index) => (
+                      <LanguageIcon
+                        lang={language}
+                        key={title + language}
+                      ></LanguageIcon>
+                    ))
                   : null}
               </div>
               <div className="self-stretch border-l-[1px] border-white"></div>
