@@ -161,7 +161,7 @@ export default function ProjectEditor({
           stream: await response.stream.blob(),
         }))
         .then(
-          (blob) => new File([blob.stream], "test.mp4", { type: blob.type }),
+          (blob) => new File([blob.stream], "Thumbnail", { type: blob.type }),
         )
         .then((image) => {
           setThumbnail(image);
@@ -247,23 +247,14 @@ export default function ProjectEditor({
   const handleAddFile = useCallback(
     (files: File[]) => {
       //Take the new image File obj and generate a useable link and ID for use in the MDX so we can provide useful previews with images not yet uploaded to the DB
-      const fileReader = new FileReader();
       const newFile = files.at(-1);
-      fileReader.onload = () => {
-        if (fileReader.result && newFile) {
-          const newImage = {
-            id: Math.max(...images.map((image) => image.id)) + 1,
-            file: newFile,
-            link:
-              typeof fileReader.result === "string"
-                ? fileReader.result
-                : new TextDecoder().decode(fileReader.result),
-          };
-          setImages((images) => [...images, newImage]);
-        }
-      };
       if (newFile) {
-        fileReader.readAsDataURL(newFile);
+        const newImage = {
+          id: Math.max(...images.map((image) => image.id)) + 1,
+          file: newFile,
+          link: URL.createObjectURL(newFile),
+        };
+        setImages((images) => [...images, newImage]);
       }
     },
     [images],
@@ -398,7 +389,7 @@ export default function ProjectEditor({
             <br></br>
           </div>
           <label htmlFor="Thumbnail">Thumbnail: </label>
-          <div>
+          <div className="flex max-h-28 gap-2">
             <input
               type="file"
               name="Thumbnail"
@@ -410,13 +401,24 @@ export default function ProjectEditor({
               }
             ></input>
             {thumbnail ? (
-              <Image
-                src={URL.createObjectURL(thumbnail)}
-                height={100}
-                width={100}
-                alt="Thumbnail"
-                className="inline"
-              ></Image>
+              thumbnail.type.includes("video") ? (
+                <div className="max-h-full basis-1/3">
+                  <video
+                    src={URL.createObjectURL(thumbnail)}
+                    controls={true}
+                    muted={true}
+                    className="h-full object-fill"
+                  ></video>
+                </div>
+              ) : (
+                <Image
+                  src={URL.createObjectURL(thumbnail)}
+                  height={100}
+                  width={100}
+                  alt="Thumbnail"
+                  className="inline"
+                ></Image>
+              )
             ) : null}
           </div>
           <div>

@@ -64,7 +64,7 @@ export default async function Project({
               loop={true}
               controls={false}
               muted={true}
-              className="rounded-xl object-cover"
+              className="h-auto w-full rounded-xl object-cover"
             ></video>
           ) : (
             <Image
