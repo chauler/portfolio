@@ -1,66 +1,25 @@
 "use client";
 
-import { evaluate, type EvaluateOptions } from "@mdx-js/mdx";
-import { useMDXComponents } from "mdx-components";
-import type { MDXComponents, MDXProps } from "mdx/types";
-import {
-  type ChangeEvent,
-  FunctionComponent,
-  type ReactNode,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { jsx, jsxs, Fragment } from "react/jsx-runtime";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Language } from "~/types/language-icons";
 import { api } from "~/trpc/react";
 import { SubmitProject } from "../_actions/SubmitProjectAction";
 import MultipleFileUpload from "./MultipleFileUpload";
-import { useDebounce } from "~/lib/clientutils";
 import MultiSelector from "./MultiSelector";
 import LoadingSymbol from "./LoadingSymbol";
 import type * as schema from "~/db/schema";
 import Image from "next/image";
-import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { useUploadThing } from "~/lib/uploadthing";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-
-type ReactMDXContent = (props: MDXProps) => ReactNode;
-type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
-const runtime = { jsx, jsxs, Fragment } as Runtime;
-
-function FallbackUI({ error, resetErrorBoundary }: FallbackProps) {
-  return (
-    <>
-      <button
-        className="w-1/4 rounded-xl border border-white hover:bg-white hover:text-black"
-        onClick={resetErrorBoundary}
-      >
-        Reload
-      </button>
-      <div role="alert">
-        <p>Something went wrong:</p>
-        <pre className="text-wrap text-red-500">
-          {HasErrorMessage(error) ? error.message : ""}
-        </pre>
-      </div>
-    </>
-  );
-}
-
-function HasErrorMessage(obj: unknown): obj is { message: string } {
-  return (
-    obj instanceof Object && "message" in obj && typeof obj.message === "string"
-  );
-}
+import MDXPreview from "./MDXPreview";
 
 export default function ProjectEditor({
   projects,
 }: {
   projects: schema.SelectPost[];
 }) {
+  //Helper for client uploads to UT servers
   const { startUpload } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
       console.log("Uploading", files.length, "files");
@@ -76,7 +35,6 @@ export default function ProjectEditor({
       console.log("onUploadProgress", p);
     },
   });
-  const CustomComponents: MDXComponents = useMDXComponents();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -90,10 +48,6 @@ export default function ProjectEditor({
     [searchParams, pathname, router],
   );
 
-  //State for existing project editor
-  const [MdxContent, setMdxContent] = useState<ReactMDXContent>(
-    () => () => null,
-  );
   const [selectedID, setSelectedID] = useState(
     parseInt(searchParams.get("id") ?? "0"),
   );
@@ -108,13 +62,6 @@ export default function ProjectEditor({
   const [brief, setBrief] = useState("");
   const [pending, setPending] = useState(false);
 
-  const handleEdit = useDebounce<[ChangeEvent<HTMLTextAreaElement>]>((e) => {
-    e.persist();
-    void evaluate(e.target.value, runtime).then((res) =>
-      setMdxContent(() => res.default),
-    );
-  }, 1000);
-
   useLayoutEffect(() => {
     const abortController = new AbortController();
 
@@ -126,18 +73,12 @@ export default function ProjectEditor({
       setThumbnail(undefined);
       setSource("");
       setBrief("");
-      evaluate("", runtime)
-        .then((res) => setMdxContent(() => res.default))
-        .catch((err) => console.log(err));
     } else {
       void fetch(projectQuery.data?.contentPath, {
         signal: abortController.signal,
       }).then((res) =>
         res.text().then((res) => {
           setSource(res);
-          return evaluate(res, runtime)
-            .then((res) => setMdxContent(() => res.default))
-            .catch((err) => console.log(err));
         }),
       );
       fetch(projectQuery.data?.briefPath)
@@ -303,20 +244,16 @@ export default function ProjectEditor({
 
   return (
     <div className="flex h-full gap-4 px-2 text-white">
-      <main className="flex h-fit min-h-fit w-[60%] max-w-[60%] flex-col items-center justify-center rounded-3xl bg-white/5 pl-8 pr-8 text-white">
-        <div className="flex w-11/12 flex-grow-0 flex-col py-16">
-          <ErrorBoundary FallbackComponent={FallbackUI}>
-            <MdxContent
-              components={CustomComponents}
-              thumbnail={projectQuery.data?.thumbnailPath ?? ""}
-              languages={projectQuery.data?.languages ?? []}
-              images={images.map((img) => img.link) ?? []}
-            ></MdxContent>
-          </ErrorBoundary>
-        </div>
-      </main>
+      <div className="flex h-fit min-h-fit w-2/3 flex-col items-center justify-center rounded-3xl bg-white/5 px-8 py-12">
+        <MDXPreview
+          thumbnailPath={projectQuery.data?.thumbnailPath}
+          images={imagesQuery.data?.map((image) => image.link)}
+          languages={projectQuery.data?.languages?.languages}
+          content={source}
+        ></MDXPreview>
+      </div>
       <div className="border border-white"></div>
-      <form className="max-w-[50%] flex-grow">
+      <form className="w-1/3">
         <LoadingSymbol setFormStatus={setPending}></LoadingSymbol>
         <label htmlFor="project" className="pr-4">
           Select a project:
@@ -403,7 +340,6 @@ export default function ProjectEditor({
             name="Content"
             onChange={(e) => {
               setSource(e.target.value);
-              handleEdit(e);
             }}
             className="w-full flex-grow bg-slate-950/50 text-white"
             cols={50}
