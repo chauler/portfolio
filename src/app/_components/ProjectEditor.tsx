@@ -5,6 +5,7 @@ import { useMDXComponents } from "mdx-components";
 import type { MDXComponents, MDXProps } from "mdx/types";
 import {
   type ChangeEvent,
+  FunctionComponent,
   type ReactNode,
   useCallback,
   useLayoutEffect,
@@ -21,7 +22,7 @@ import MultiSelector from "./MultiSelector";
 import LoadingSymbol from "./LoadingSymbol";
 import type * as schema from "~/db/schema";
 import Image from "next/image";
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { useUploadThing } from "~/lib/uploadthing";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,31 @@ import { useRouter } from "next/navigation";
 type ReactMDXContent = (props: MDXProps) => ReactNode;
 type Runtime = Pick<EvaluateOptions, "jsx" | "jsxs" | "Fragment">;
 const runtime = { jsx, jsxs, Fragment } as Runtime;
+
+function FallbackUI({ error, resetErrorBoundary }: FallbackProps) {
+  return (
+    <>
+      <button
+        className="w-1/4 rounded-xl border border-white hover:bg-white hover:text-black"
+        onClick={resetErrorBoundary}
+      >
+        Reload
+      </button>
+      <div role="alert">
+        <p>Something went wrong:</p>
+        <pre className="text-wrap text-red-500">
+          {HasErrorMessage(error) ? error.message : ""}
+        </pre>
+      </div>
+    </>
+  );
+}
+
+function HasErrorMessage(obj: unknown): obj is { message: string } {
+  return (
+    obj instanceof Object && "message" in obj && typeof obj.message === "string"
+  );
+}
 
 export default function ProjectEditor({
   projects,
@@ -279,9 +305,7 @@ export default function ProjectEditor({
     <div className="flex h-full gap-4 px-2 text-white">
       <main className="flex h-fit min-h-fit w-[60%] max-w-[60%] flex-col items-center justify-center rounded-3xl bg-white/5 pl-8 pr-8 text-white">
         <div className="flex w-11/12 flex-grow-0 flex-col py-16">
-          <ErrorBoundary
-            fallback={<div>Something went wrong! Try refreshing the page.</div>}
-          >
+          <ErrorBoundary FallbackComponent={FallbackUI}>
             <MdxContent
               components={CustomComponents}
               thumbnail={projectQuery.data?.thumbnailPath ?? ""}
