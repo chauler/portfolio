@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Language } from "~/types/language-icons";
 import { api } from "~/trpc/react";
 import { SubmitProject } from "../_actions/SubmitProjectAction";
@@ -13,6 +13,31 @@ import { useUploadThing } from "~/lib/uploadthing";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import MDXPreview from "./MDXPreview";
+import { useQuery } from "@tanstack/react-query";
+
+async function FetchThumbnail(path: string): Promise<File> {
+  const response = await fetch(path);
+  if (!response.body) throw new Error("Error fetching Thumbnail");
+  const blob = await response.blob();
+  const file = new File([blob], "Thumbnail", { type: blob.type });
+  return file;
+}
+
+async function FetchImage(
+  image: {
+    id: number;
+    link: string;
+    name: string;
+    postID: number;
+  },
+  abortController: AbortController,
+): Promise<{ id: number; file: File; link: string }> {
+  const response = await fetch(image.link, abortController);
+  if (!response.body) throw new Error(`Error fetching ${image.name}`);
+  const blob = await response.blob();
+  const file = new File([blob], image.name, { type: blob.type });
+  return { id: image.id, file: file, link: image.link };
+}
 
 export default function ProjectEditor({
   projects,
@@ -35,7 +60,6 @@ export default function ProjectEditor({
       console.log("onUploadProgress", p);
     },
   });
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -48,12 +72,47 @@ export default function ProjectEditor({
     [searchParams, pathname, router],
   );
 
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [selectedID, setSelectedID] = useState(
     parseInt(searchParams.get("id") ?? "0"),
   );
-  const projectQuery = api.project.getProject.useQuery(selectedID);
-  const imagesQuery = api.project.getProjectImages.useQuery(selectedID);
-  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const projectQuery = api.project.getProject.useQuery(selectedID, {
+    staleTime: 0,
+  });
+  const imagesQuery = api.project.getProjectImages.useQuery(selectedID, {
+    staleTime: 0,
+  });
+
+  const briefQuery = useQuery({
+    queryKey: [selectedID, projectQuery.data?.briefPath],
+    queryFn: async () => {
+      const res = await fetch(projectQuery.data?.briefPath ?? "");
+      return await res.text();
+    },
+    enabled: !!projectQuery.data?.briefPath,
+  });
+
+  const sourceQuery = useQuery({
+    queryKey: [selectedID, projectQuery.data?.contentPath],
+    queryFn: async () => {
+      const res = await fetch(projectQuery.data?.contentPath ?? "");
+      return await res.text();
+    },
+    enabled: !!projectQuery.data?.contentPath,
+  });
+
+  const thumbnailQuery = useQuery({
+    queryKey: [selectedID, projectQuery.data?.thumbnailPath],
+    queryFn: () => FetchThumbnail(projectQuery.data?.thumbnailPath ?? ""),
+    enabled: !!projectQuery.data?.thumbnailPath,
+  });
+
+  if (thumbnailQuery.data && thumbnailInputRef.current) {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(thumbnailQuery.data);
+    thumbnailInputRef.current.files = dataTransfer.files;
+  }
+
   const [thumbnail, setThumbnail] = useState<File>();
   const [images, setImages] = useState<
     { id: number; file: File; link: string }[]
@@ -62,143 +121,40 @@ export default function ProjectEditor({
   const [brief, setBrief] = useState("");
   const [pending, setPending] = useState(false);
 
-  useLayoutEffect(() => {
-    const abortController = new AbortController();
-
-    //Either project hasn't loaded yet or user selected New Project
-    if (!projectQuery.data) {
-      if (thumbnailInputRef.current?.files) {
+  //Set state for preview purposes when query returns a new thumbnail
+  useEffect(() => {
+    if (!thumbnailQuery.data) {
+      setThumbnail(undefined);
+      if (thumbnailInputRef.current) {
         thumbnailInputRef.current.files = new DataTransfer().files;
       }
-      setThumbnail(undefined);
-      setSource("");
+    } else {
+      setThumbnail(thumbnailQuery.data);
+    }
+  }, [thumbnailQuery.data]);
+
+  useEffect(() => {
+    if (!briefQuery.data) {
       setBrief("");
     } else {
-      void fetch(projectQuery.data?.contentPath, {
-        signal: abortController.signal,
-      }).then((res) =>
-        res.text().then((res) => {
-          setSource(res);
-        }),
-      );
-      fetch(projectQuery.data?.briefPath)
-        .then((res) =>
-          res.text().then((res) => {
-            setBrief(res);
-          }),
-        )
-        .catch((err) => console.error(err));
-      fetch(projectQuery.data.thumbnailPath, {
-        signal: abortController.signal,
-      })
-        .then((response) => {
-          if (!response.body) return;
-          const reader = response.body.getReader();
-          return {
-            type: response.headers.get("content-type"),
-            stream: new ReadableStream({
-              start(controller) {
-                return pump();
-                function pump() {
-                  return reader
-                    .read()
-                    .then(({ done, value }): Promise<void> | void => {
-                      // When no more data needs to be consumed, close the stream
-                      if (done) {
-                        controller.close();
-                        return;
-                      }
-                      // Enqueue the next data chunk into our target stream
-                      controller.enqueue(value);
-                      return pump();
-                    });
-                }
-              },
-            }),
-          };
-        })
-        // Create a new response out of the stream
-        .then((stream) => ({
-          type: stream?.type ?? "",
-          stream: new Response(stream?.stream),
-        }))
-        // Create an object URL for the response
-        .then(async (response) => ({
-          type: response.type,
-          stream: await response.stream.blob(),
-        }))
-        .then(
-          (blob) => new File([blob.stream], "Thumbnail", { type: blob.type }),
-        )
-        .then((image) => {
-          setThumbnail(image);
-          const dataTransfer = new DataTransfer();
-          dataTransfer.items.add(image);
-          if (thumbnailInputRef.current)
-            thumbnailInputRef.current.files = dataTransfer.files;
-        })
-        .catch((err) => console.error(err));
+      setBrief(briefQuery.data);
     }
-    return () => {
-      abortController.abort();
-    };
-  }, [projectQuery.data, selectedID]);
+  }, [briefQuery.data]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (!sourceQuery.data) {
+      setSource("");
+    } else {
+      setSource(sourceQuery.data);
+    }
+  }, [sourceQuery.data]);
+
+  useEffect(() => {
     const abortController = new AbortController();
 
     if (imagesQuery.data) {
       Promise.all(
-        imagesQuery.data.map((image) => {
-          return (
-            fetch(image.link, { signal: abortController.signal })
-              .then((response) => {
-                if (!response.body) return;
-                const reader = response.body.getReader();
-                return {
-                  type: response.headers.get("content-type"),
-                  stream: new ReadableStream({
-                    start(controller) {
-                      return pump();
-                      function pump() {
-                        return reader
-                          .read()
-                          .then(({ done, value }): Promise<void> | void => {
-                            // When no more data needs to be consumed, close the stream
-                            if (done) {
-                              controller.close();
-                              return;
-                            }
-                            // Enqueue the next data chunk into our target stream
-                            controller.enqueue(value);
-                            return pump();
-                          });
-                      }
-                    },
-                  }),
-                };
-              })
-              // Create a new response out of the stream
-              .then((stream) => ({
-                type: stream?.type,
-                stream: new Response(stream?.stream),
-              }))
-              // Create an object URL for the response
-              .then(async (response) => ({
-                type: response.type ?? "",
-                stream: await response.stream.blob(),
-              }))
-              .then((blob) => ({
-                id: image.id,
-                file: new File([blob.stream], image.name, { type: blob.type }),
-                link: image.link,
-              }))
-              .catch((err) => {
-                console.error(err);
-                return undefined;
-              })
-          );
-        }),
+        imagesQuery.data.map((image) => FetchImage(image, abortController)),
       )
         .then((result) => {
           setImages(result.filter((image) => image !== undefined));
@@ -209,7 +165,7 @@ export default function ProjectEditor({
     return () => {
       abortController.abort();
     };
-  }, [imagesQuery.data, selectedID]);
+  }, [imagesQuery.data]);
 
   const handleAddFile = useCallback(
     (files: File[]) => {
@@ -356,9 +312,7 @@ export default function ProjectEditor({
               required={true}
               ref={thumbnailInputRef}
               className="inline"
-              onChange={(e) =>
-                e.target.files?.[0] ? setThumbnail(e.target.files[0]) : 0
-              }
+              onChange={(e) => setThumbnail(e.target.files?.[0])}
             ></input>
             {thumbnail ? (
               thumbnail.type.includes("video") ? (
