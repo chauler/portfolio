@@ -28,6 +28,14 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "utfs.io" }],
   },
+  rewrites: async () => {
+    return [
+      {
+        source: "/game",
+        destination: "http://5.161.61.70:3000/", // Matched parameters can be used in the destination
+      },
+    ];
+  },
 };
 
 // Merge MDX config with Next.js config
