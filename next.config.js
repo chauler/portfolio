@@ -29,26 +29,16 @@ const nextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "utfs.io" }],
   },
   rewrites: async () => {
-    return {
-      beforeFiles: [
-        {
-          source: "/game",
-          destination: "http://5.161.61.70:3000/", // Matched parameters can be used in the destination
-        },
-      ],
-      afterFiles: [
-        {
-          source: "/game",
-          destination: "http://5.161.61.70:3000/",
-        },
-      ],
-      fallback: [
-        {
-          source: "/game",
-          destination: "http://5.161.61.70:3000/",
-        },
-      ],
-    };
+    return [
+      {
+        source: "/game",
+        destination: "http://5.161.61.70:3000/",
+      },
+      {
+        source: "/assets/:path*",
+        destination: "http://5.161.61.70:3000/assets/:path*",
+      },
+    ];
   },
 };
 

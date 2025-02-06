@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/game",
-      "destination": "http://5.161.61.70:3000"
-    }
-  ]
-}
