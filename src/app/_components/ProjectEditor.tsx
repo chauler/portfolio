@@ -103,15 +103,20 @@ export default function ProjectEditor({
 
   const thumbnailQuery = useQuery({
     queryKey: [selectedID, projectQuery.data?.thumbnailPath],
-    queryFn: () => FetchThumbnail(projectQuery.data?.thumbnailPath ?? ""),
+    queryFn: () => {
+      return FetchThumbnail(projectQuery.data?.thumbnailPath ?? "");
+    },
     enabled: !!projectQuery.data?.thumbnailPath,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
-  if (thumbnailQuery.data && thumbnailInputRef.current) {
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(thumbnailQuery.data);
-    thumbnailInputRef.current.files = dataTransfer.files;
-  }
+  // if (thumbnailQuery.data && thumbnailInputRef.current) {
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(thumbnailQuery.data);
+  //   thumbnailInputRef.current.files = dataTransfer.files;
+  // }
 
   const [thumbnail, setThumbnail] = useState<File>();
   const [images, setImages] = useState<
@@ -129,6 +134,11 @@ export default function ProjectEditor({
         thumbnailInputRef.current.files = new DataTransfer().files;
       }
     } else {
+      if (thumbnailInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(thumbnailQuery.data);
+        thumbnailInputRef.current.files = dataTransfer.files;
+      }
       setThumbnail(thumbnailQuery.data);
     }
   }, [thumbnailQuery.data]);
@@ -312,7 +322,10 @@ export default function ProjectEditor({
               required={true}
               ref={thumbnailInputRef}
               className="inline"
-              onChange={(e) => setThumbnail(e.target.files?.[0])}
+              onChange={(e) => {
+                console.log(e.target.files);
+                setThumbnail(e.target.files?.[0]);
+              }}
             ></input>
             {thumbnail ? (
               thumbnail.type.includes("video") ? (
@@ -364,24 +377,28 @@ export default function ProjectEditor({
               }
 
               //Get all file contents and upload direct to storage. Get keys and send those to DB
-              const [imageKeys, thumbnailKey] = await Promise.all([
+              const [imageKeys, thumbnailKey] = await Promise.allSettled([
                 images.length > 0 ? startUpload(images as File[]) : undefined,
                 startUpload([thumbnail as File]),
               ]);
               formData.delete("Images");
               formData.delete("Thumbnail");
 
-              if (images.length > 0 && imageKeys) {
-                imageKeys.forEach((image) => {
+              if (
+                images.length > 0 &&
+                imageKeys.status === "fulfilled" &&
+                imageKeys.value
+              ) {
+                imageKeys.value.forEach((image) => {
                   formData.append("Images", image.key);
                   formData.append("ImageNames", image.name);
                 });
-              } else {
+              } else if (!imageKeys) {
                 console.log("Failed to upload images");
               }
 
-              if (thumbnailKey) {
-                thumbnailKey.forEach((image) =>
+              if (thumbnailKey.status === "fulfilled" && thumbnailKey.value) {
+                thumbnailKey.value.forEach((image) =>
                   formData.append("Thumbnail", image.key),
                 );
               } else {
