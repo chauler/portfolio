@@ -42,11 +42,11 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <BackgroundCanvas></BackgroundCanvas>
+        <BackgroundCanvas numCircles={12}></BackgroundCanvas>
 
         <div className="h-full">
           <TRPCReactProvider>
-            <NavigationMenu className="sticky top-0 min-h-14 justify-end bg-transparent filter">
+            <NavigationMenu className="sticky top-0 min-h-14 justify-end">
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Projects</NavigationMenuTrigger>

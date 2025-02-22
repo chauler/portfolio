@@ -8,6 +8,7 @@ import Image, { ImageLoaderProps } from "next/image";
 import { IsImageFileExt, IsVideoFileExt } from "~/lib/utils";
 import z, { string } from "zod";
 import { cn } from "src/lib/utils";
+import BackgroundCanvas from "~/app/_components/BackgroundCanvas";
 
 // This file is required to use @next/mdx in the `app` directory.
 export function useMDXComponents(components?: MDXComponents): MDXComponents {
@@ -61,29 +62,6 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
         muted={true}
       ></video>
     ),
-    // Image: (props: { src: string; width: number; height: number }) => {
-    //   if (!ImageProps.safeParse(props).success) {
-    //     console.log("Invalid props");
-    //     return null;
-    //   }
-    //   return IsImageFileExt(props.src) ? (
-    //     <Image {...props}></Image>
-    //   ) : IsVideoFileExt(props.src) ? (
-    //     <video
-    //       src={props.src}
-    //       autoPlay={true}
-    //       loop={true}
-    //       controls={false}
-    //       muted={true}
-    //       className="rounded-xl object-cover"
-    //     ></video>
-    //   ) : (
-    //     () => {
-    //       console.log("No file extension");
-    //       return null;
-    //     }
-    //   );
-    // },
     ul: ({ children }) => (
       <ul className="inline list-disc py-2 [&_ul>li]:ml-4 [&_ul]:list-[circle]">
         {children}
@@ -91,6 +69,15 @@ export function useMDXComponents(components?: MDXComponents): MDXComponents {
     ),
     li: ({ children }) => <li className="py-2 text-xl">{children}</li>,
     em: ({ children }) => <em className="font-bold not-italic">{children}</em>,
+    BackgroundDemo: () => (
+      <div className="relative h-96 w-full overflow-hidden border border-white">
+        <BackgroundCanvas
+          numCircles={8}
+          fullScreen={false}
+          circlestyles="w-48"
+        ></BackgroundCanvas>
+      </div>
+    ),
     ...components,
   };
 }
